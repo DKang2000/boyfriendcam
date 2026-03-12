@@ -1,0 +1,64 @@
+buildscript {
+  repositories {
+    google()
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath("com.android.tools.build:gradle:8.7.3")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.20")
+  }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+def safeExtGet(prop, fallback) {
+  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+android {
+  compileSdk safeExtGet('compileSdkVersion', 36)
+  namespace "com.visioncamera.poselandmarksplugin"
+
+  defaultConfig {
+    minSdk safeExtGet('minSdkVersion', 26)
+    targetSdk safeExtGet('targetSdkVersion', 36)
+    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", "true"
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+
+  kotlinOptions {
+    jvmTarget = '17'
+  }
+
+  sourceSets {
+    main {
+      java.srcDirs = ['src/main/java']
+      assets.srcDirs = ['../assets']
+    }
+  }
+}
+
+repositories {
+  google()
+  mavenCentral()
+}
+
+dependencies {
+  implementation "com.facebook.react:react-android:+"
+  implementation "com.google.mediapipe:tasks-vision:latest.release"
+  api project(":react-native-vision-camera")
+
+
+}

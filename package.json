@@ -1,0 +1,37 @@
+{
+  "name": "boyfriendcam",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "android:x86:build": "cmd /c scripts\\build-android-x86.cmd",
+    "android:x86:open": "cmd /c scripts\\install-and-open-x86.cmd",
+    "ios": "expo run:ios",
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "expo": "~55.0.5",
+    "expo-build-properties": "~55.0.9",
+    "expo-dev-client": "~55.0.13",
+    "expo-splash-screen": "~55.0.10",
+    "expo-status-bar": "~55.0.4",
+    "react": "19.2.0",
+    "react-native": "0.83.2",
+    "react-native-reanimated": "4.2.1",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-svg": "15.15.3",
+    "react-native-vision-camera": "^4.7.3",
+    "react-native-worklets-core": "^1.6.3",
+    "vision-camera-pose-landmarks-plugin": "file:packages/vision-camera-pose-landmarks-plugin"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "babel-preset-expo": "^55.0.11",
+    "eslint": "^9.38.0",
+    "eslint-config-expo": "~10.0.0",
+    "typescript": "~5.9.2"
+  },
+  "private": true
+}
