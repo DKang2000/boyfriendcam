@@ -1,5 +1,0 @@
-APP_BUNDLE_IDENTIFIER = com.boyfriendcam.native
-APP_TEST_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER)Tests
-DEVELOPMENT_TEAM_ID =
-
-#include? "BoyfriendCamNative.local.xcconfig"

@@ -1,0 +1,4 @@
+// Copy this file to BoyfriendCamNative.local.xcconfig for local device signing.
+DEVELOPMENT_TEAM_ID = YOURTEAMID
+APP_BUNDLE_IDENTIFIER = com.yourname.boyfriendcamnative
+APP_TEST_BUNDLE_IDENTIFIER = com.yourname.boyfriendcamnativeTests

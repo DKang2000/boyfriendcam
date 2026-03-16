@@ -1,0 +1,722 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000101 /* BoyfriendCamNativeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000031 /* BoyfriendCamNativeApp.swift */; };
+		A00000000000000000000102 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000032 /* AppEnvironment.swift */; };
+		A00000000000000000000103 /* PerformanceSignposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000034 /* PerformanceSignposts.swift */; };
+		A00000000000000000000104 /* CameraAuthorizationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000036 /* CameraAuthorizationState.swift */; };
+		A00000000000000000000105 /* CapturedPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000037 /* CapturedPhoto.swift */; };
+		A00000000000000000000106 /* CameraScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000003A /* CameraScreen.swift */; };
+		A00000000000000000000107 /* CameraShellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000003B /* CameraShellViewModel.swift */; };
+		A00000000000000000000108 /* CameraPreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000003C /* CameraPreviewContainer.swift */; };
+		A00000000000000000000109 /* CameraAuthorizationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000003F /* CameraAuthorizationService.swift */; };
+		A0000000000000000000010A /* CameraOrientationMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000040 /* CameraOrientationMapper.swift */; };
+		A0000000000000000000010B /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000041 /* CameraPreviewView.swift */; };
+		A0000000000000000000010C /* CameraSessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000042 /* CameraSessionController.swift */; };
+		A0000000000000000000010D /* CameraOrientationMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000046 /* CameraOrientationMapperTests.swift */; };
+		A0000000000000000000010E /* PoseLandmarkName.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000047 /* PoseLandmarkName.swift */; };
+		A0000000000000000000010F /* PoseLandmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000048 /* PoseLandmark.swift */; };
+		A00000000000000000000110 /* PoseFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000049 /* PoseFrame.swift */; };
+		A00000000000000000000111 /* ShotTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000004A /* ShotTemplate.swift */; };
+		A00000000000000000000112 /* PoseFrameMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000004B /* PoseFrameMapper.swift */; };
+		A00000000000000000000113 /* PoseDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000004C /* PoseDetectionService.swift */; };
+		A00000000000000000000114 /* PoseDebugOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000004D /* PoseDebugOverlayView.swift */; };
+		A00000000000000000000115 /* ShotTemplateOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000004E /* ShotTemplateOverlayView.swift */; };
+		A00000000000000000000116 /* ShotTemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000004F /* ShotTemplatePicker.swift */; };
+		A00000000000000000000117 /* PoseFrameMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000050 /* PoseFrameMapperTests.swift */; };
+		A00000000000000000000118 /* ShotTemplateRegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000053 /* ShotTemplateRegistryTests.swift */; };
+		A00000000000000000000119 /* CoachPersona.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000054 /* CoachPersona.swift */; };
+		A0000000000000000000011A /* CoachingTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000055 /* CoachingTypes.swift */; };
+		A0000000000000000000011B /* FrameScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000056 /* FrameScoringEngine.swift */; };
+		A0000000000000000000011C /* PromptSelectionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000057 /* PromptSelectionEngine.swift */; };
+		A0000000000000000000011D /* CoachingPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000058 /* CoachingPipeline.swift */; };
+		A0000000000000000000011E /* CoachPersonaPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000059 /* CoachPersonaPicker.swift */; };
+		A0000000000000000000011F /* FrameScoringEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005A /* FrameScoringEngineTests.swift */; };
+		A00000000000000000000120 /* PromptSelectionEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005B /* PromptSelectionEngineTests.swift */; };
+		A00000000000000000000121 /* CropPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005C /* CropPreview.swift */; };
+		A00000000000000000000122 /* LightingAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005D /* LightingAnalysis.swift */; };
+		A00000000000000000000123 /* MotionGuidance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005E /* MotionGuidance.swift */; };
+		A00000000000000000000124 /* CaptureSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000005F /* CaptureSession.swift */; };
+		A00000000000000000000125 /* CaptureModePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000060 /* CaptureModePicker.swift */; };
+		A00000000000000000000126 /* CropPreviewPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000061 /* CropPreviewPicker.swift */; };
+		A00000000000000000000127 /* LevelGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000062 /* LevelGuideView.swift */; };
+		A00000000000000000000128 /* CropPreviewMaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000063 /* CropPreviewMaskView.swift */; };
+		A00000000000000000000129 /* ReviewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000064 /* ReviewScreen.swift */; };
+		A0000000000000000000012A /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000065 /* HistoryScreen.swift */; };
+		A0000000000000000000012B /* LightingAnalysisService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000066 /* LightingAnalysisService.swift */; };
+		A0000000000000000000012C /* MotionGuidanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000067 /* MotionGuidanceService.swift */; };
+		A0000000000000000000012D /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000068 /* SessionStore.swift */; };
+		A0000000000000000000012E /* PhotoLibraryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000069 /* PhotoLibraryExporter.swift */; };
+		A0000000000000000000012F /* CaptureOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000006A /* CaptureOrchestrator.swift */; };
+		A00000000000000000000130 /* CaptureSessionRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000006B /* CaptureSessionRecordTests.swift */; };
+		A00000000000000000000131 /* CropPreviewConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000006C /* CropPreviewConfigurationTests.swift */; };
+		A00000000000000000000132 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000006D /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A00000000000000000000070 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A00000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A00000000000000000000020;
+			remoteInfo = BoyfriendCamNative;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A00000000000000000000031 /* BoyfriendCamNativeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoyfriendCamNativeApp.swift; sourceTree = "<group>"; };
+		A00000000000000000000032 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
+		A00000000000000000000033 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A00000000000000000000034 /* PerformanceSignposts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceSignposts.swift; sourceTree = "<group>"; };
+		A00000000000000000000035 /* BoyfriendCamNative.app.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BoyfriendCamNative.app.xcconfig; sourceTree = "<group>"; };
+		A00000000000000000000036 /* CameraAuthorizationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAuthorizationState.swift; sourceTree = "<group>"; };
+		A00000000000000000000037 /* CapturedPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturedPhoto.swift; sourceTree = "<group>"; };
+		A00000000000000000000038 /* BoyfriendCamNative.shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BoyfriendCamNative.shared.xcconfig; sourceTree = "<group>"; };
+		A00000000000000000000039 /* BoyfriendCamNative.tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BoyfriendCamNative.tests.xcconfig; sourceTree = "<group>"; };
+		A0000000000000000000003A /* CameraScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraScreen.swift; sourceTree = "<group>"; };
+		A0000000000000000000003B /* CameraShellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraShellViewModel.swift; sourceTree = "<group>"; };
+		A0000000000000000000003C /* CameraPreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewContainer.swift; sourceTree = "<group>"; };
+		A0000000000000000000003D /* BoyfriendCamNative.local.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BoyfriendCamNative.local.example.xcconfig; sourceTree = "<group>"; };
+		A0000000000000000000003F /* CameraAuthorizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAuthorizationService.swift; sourceTree = "<group>"; };
+		A00000000000000000000040 /* CameraOrientationMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOrientationMapper.swift; sourceTree = "<group>"; };
+		A00000000000000000000041 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		A00000000000000000000042 /* CameraSessionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionController.swift; sourceTree = "<group>"; };
+		A00000000000000000000046 /* CameraOrientationMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOrientationMapperTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000047 /* PoseLandmarkName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseLandmarkName.swift; sourceTree = "<group>"; };
+		A00000000000000000000048 /* PoseLandmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseLandmark.swift; sourceTree = "<group>"; };
+		A00000000000000000000049 /* PoseFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseFrame.swift; sourceTree = "<group>"; };
+		A0000000000000000000004A /* ShotTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShotTemplate.swift; sourceTree = "<group>"; };
+		A0000000000000000000004B /* PoseFrameMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseFrameMapper.swift; sourceTree = "<group>"; };
+		A0000000000000000000004C /* PoseDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseDetectionService.swift; sourceTree = "<group>"; };
+		A0000000000000000000004D /* PoseDebugOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseDebugOverlayView.swift; sourceTree = "<group>"; };
+		A0000000000000000000004E /* ShotTemplateOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShotTemplateOverlayView.swift; sourceTree = "<group>"; };
+		A0000000000000000000004F /* ShotTemplatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShotTemplatePicker.swift; sourceTree = "<group>"; };
+		A00000000000000000000050 /* PoseFrameMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseFrameMapperTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000051 /* BoyfriendCamNative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BoyfriendCamNative.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000052 /* BoyfriendCamNativeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoyfriendCamNativeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000053 /* ShotTemplateRegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShotTemplateRegistryTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000054 /* CoachPersona.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachPersona.swift; sourceTree = "<group>"; };
+		A00000000000000000000055 /* CoachingTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachingTypes.swift; sourceTree = "<group>"; };
+		A00000000000000000000056 /* FrameScoringEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameScoringEngine.swift; sourceTree = "<group>"; };
+		A00000000000000000000057 /* PromptSelectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptSelectionEngine.swift; sourceTree = "<group>"; };
+		A00000000000000000000058 /* CoachingPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachingPipeline.swift; sourceTree = "<group>"; };
+		A00000000000000000000059 /* CoachPersonaPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachPersonaPicker.swift; sourceTree = "<group>"; };
+		A0000000000000000000005A /* FrameScoringEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameScoringEngineTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000005B /* PromptSelectionEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptSelectionEngineTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000005C /* CropPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropPreview.swift; sourceTree = "<group>"; };
+		A0000000000000000000005D /* LightingAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightingAnalysis.swift; sourceTree = "<group>"; };
+		A0000000000000000000005E /* MotionGuidance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionGuidance.swift; sourceTree = "<group>"; };
+		A0000000000000000000005F /* CaptureSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureSession.swift; sourceTree = "<group>"; };
+		A00000000000000000000060 /* CaptureModePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureModePicker.swift; sourceTree = "<group>"; };
+		A00000000000000000000061 /* CropPreviewPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropPreviewPicker.swift; sourceTree = "<group>"; };
+		A00000000000000000000062 /* LevelGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGuideView.swift; sourceTree = "<group>"; };
+		A00000000000000000000063 /* CropPreviewMaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropPreviewMaskView.swift; sourceTree = "<group>"; };
+		A00000000000000000000064 /* ReviewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewScreen.swift; sourceTree = "<group>"; };
+		A00000000000000000000065 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
+		A00000000000000000000066 /* LightingAnalysisService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightingAnalysisService.swift; sourceTree = "<group>"; };
+		A00000000000000000000067 /* MotionGuidanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionGuidanceService.swift; sourceTree = "<group>"; };
+		A00000000000000000000068 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000069 /* PhotoLibraryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryExporter.swift; sourceTree = "<group>"; };
+		A0000000000000000000006A /* CaptureOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureOrchestrator.swift; sourceTree = "<group>"; };
+		A0000000000000000000006B /* CaptureSessionRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureSessionRecordTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000006C /* CropPreviewConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropPreviewConfigurationTests.swift; sourceTree = "<group>"; };
+		A0000000000000000000006D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A00000000000000000000081 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000082 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000010 /* App */,
+				A00000000000000000000011 /* AppCore */,
+				A0000000000000000000001B1 /* Config */,
+				A00000000000000000000012 /* Features */,
+				A00000000000000000000013 /* Services */,
+				A00000000000000000000014 /* Testing */,
+				A00000000000000000000015 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A00000000000000000000010 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000031 /* BoyfriendCamNativeApp.swift */,
+				A00000000000000000000032 /* AppEnvironment.swift */,
+				A00000000000000000000033 /* Info.plist */,
+				A0000000000000000000006D /* Assets.xcassets */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000011 /* AppCore */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000016 /* Instrumentation */,
+				A00000000000000000000017 /* Models */,
+			);
+			path = AppCore;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000012 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000018 /* Camera */,
+				A0000000000000000000001D /* Review */,
+				A0000000000000000000001E /* History */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000013 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000019 /* Camera */,
+				A0000000000000000000001C /* Coaching */,
+				A0000000000000000000001F /* Lighting */,
+				A00000000000000000000022 /* Motion */,
+				A0000000000000000000001B /* Pose */,
+				A00000000000000000000023 /* Persistence */,
+				A00000000000000000000024 /* Export */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000014 /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000001A /* Unit */,
+			);
+			path = Testing;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000015 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000051 /* BoyfriendCamNative.app */,
+				A00000000000000000000052 /* BoyfriendCamNativeTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000016 /* Instrumentation */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000034 /* PerformanceSignposts.swift */,
+			);
+			path = Instrumentation;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000017 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000036 /* CameraAuthorizationState.swift */,
+				A00000000000000000000037 /* CapturedPhoto.swift */,
+				A00000000000000000000054 /* CoachPersona.swift */,
+				A00000000000000000000055 /* CoachingTypes.swift */,
+				A0000000000000000000005C /* CropPreview.swift */,
+				A0000000000000000000005F /* CaptureSession.swift */,
+				A0000000000000000000005D /* LightingAnalysis.swift */,
+				A0000000000000000000005E /* MotionGuidance.swift */,
+				A00000000000000000000047 /* PoseLandmarkName.swift */,
+				A00000000000000000000048 /* PoseLandmark.swift */,
+				A00000000000000000000049 /* PoseFrame.swift */,
+				A0000000000000000000004A /* ShotTemplate.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000018 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000003A /* CameraScreen.swift */,
+				A0000000000000000000003B /* CameraShellViewModel.swift */,
+				A0000000000000000000003C /* CameraPreviewContainer.swift */,
+				A00000000000000000000060 /* CaptureModePicker.swift */,
+				A00000000000000000000059 /* CoachPersonaPicker.swift */,
+				A00000000000000000000061 /* CropPreviewPicker.swift */,
+				A00000000000000000000062 /* LevelGuideView.swift */,
+				A0000000000000000000004D /* PoseDebugOverlayView.swift */,
+				A0000000000000000000004F /* ShotTemplatePicker.swift */,
+				A0000000000000000000004E /* ShotTemplateOverlayView.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000019 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000003F /* CameraAuthorizationService.swift */,
+				A00000000000000000000040 /* CameraOrientationMapper.swift */,
+				A00000000000000000000041 /* CameraPreviewView.swift */,
+				A0000000000000000000006A /* CaptureOrchestrator.swift */,
+				A00000000000000000000042 /* CameraSessionController.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		A0000000000000000000001A /* Unit */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000046 /* CameraOrientationMapperTests.swift */,
+				A0000000000000000000006B /* CaptureSessionRecordTests.swift */,
+				A0000000000000000000006C /* CropPreviewConfigurationTests.swift */,
+				A0000000000000000000005A /* FrameScoringEngineTests.swift */,
+				A00000000000000000000050 /* PoseFrameMapperTests.swift */,
+				A0000000000000000000005B /* PromptSelectionEngineTests.swift */,
+				A00000000000000000000053 /* ShotTemplateRegistryTests.swift */,
+			);
+			path = Unit;
+			sourceTree = "<group>";
+		};
+		A0000000000000000000001B /* Pose */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000004B /* PoseFrameMapper.swift */,
+				A0000000000000000000004C /* PoseDetectionService.swift */,
+			);
+			path = Pose;
+			sourceTree = "<group>";
+		};
+		A0000000000000000000001B1 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000038 /* BoyfriendCamNative.shared.xcconfig */,
+				A00000000000000000000035 /* BoyfriendCamNative.app.xcconfig */,
+				A00000000000000000000039 /* BoyfriendCamNative.tests.xcconfig */,
+				A0000000000000000000003D /* BoyfriendCamNative.local.example.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		A0000000000000000000001C /* Coaching */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000058 /* CoachingPipeline.swift */,
+				A00000000000000000000056 /* FrameScoringEngine.swift */,
+				A00000000000000000000057 /* PromptSelectionEngine.swift */,
+			);
+			path = Coaching;
+			sourceTree = "<group>";
+		};
+		A0000000000000000000001D /* Review */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000063 /* CropPreviewMaskView.swift */,
+				A00000000000000000000064 /* ReviewScreen.swift */,
+			);
+			path = Review;
+			sourceTree = "<group>";
+		};
+		A0000000000000000000001E /* History */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000065 /* HistoryScreen.swift */,
+			);
+			path = History;
+			sourceTree = "<group>";
+		};
+		A0000000000000000000001F /* Lighting */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000066 /* LightingAnalysisService.swift */,
+			);
+			path = Lighting;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000022 /* Motion */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000067 /* MotionGuidanceService.swift */,
+			);
+			path = Motion;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000023 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000068 /* SessionStore.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000024 /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000069 /* PhotoLibraryExporter.swift */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A00000000000000000000020 /* BoyfriendCamNative */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A000000000000000000000A0 /* Build configuration list for PBXNativeTarget "BoyfriendCamNative" */;
+			buildPhases = (
+				A00000000000000000000090 /* Sources */,
+				A00000000000000000000081 /* Frameworks */,
+				A00000000000000000000092 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BoyfriendCamNative;
+			productName = BoyfriendCamNative;
+			productReference = A00000000000000000000051 /* BoyfriendCamNative.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A00000000000000000000021 /* BoyfriendCamNativeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A000000000000000000000A1 /* Build configuration list for PBXNativeTarget "BoyfriendCamNativeTests" */;
+			buildPhases = (
+				A00000000000000000000091 /* Sources */,
+				A00000000000000000000082 /* Frameworks */,
+				A00000000000000000000093 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A00000000000000000000071 /* PBXTargetDependency */,
+			);
+			name = BoyfriendCamNativeTests;
+			productName = BoyfriendCamNativeTests;
+			productReference = A00000000000000000000052 /* BoyfriendCamNativeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					A00000000000000000000020 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					A00000000000000000000021 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = A00000000000000000000020;
+					};
+				};
+			};
+			buildConfigurationList = A000000000000000000000A2 /* Build configuration list for PBXProject "BoyfriendCamNative" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A00000000000000000000002;
+			productRefGroup = A00000000000000000000015 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A00000000000000000000020 /* BoyfriendCamNative */,
+				A00000000000000000000021 /* BoyfriendCamNativeTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A00000000000000000000092 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000132 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000093 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A00000000000000000000090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000101 /* BoyfriendCamNativeApp.swift in Sources */,
+				A00000000000000000000102 /* AppEnvironment.swift in Sources */,
+				A00000000000000000000103 /* PerformanceSignposts.swift in Sources */,
+				A00000000000000000000104 /* CameraAuthorizationState.swift in Sources */,
+				A00000000000000000000105 /* CapturedPhoto.swift in Sources */,
+				A00000000000000000000106 /* CameraScreen.swift in Sources */,
+				A00000000000000000000107 /* CameraShellViewModel.swift in Sources */,
+				A00000000000000000000108 /* CameraPreviewContainer.swift in Sources */,
+				A00000000000000000000125 /* CaptureModePicker.swift in Sources */,
+				A00000000000000000000109 /* CameraAuthorizationService.swift in Sources */,
+				A0000000000000000000010A /* CameraOrientationMapper.swift in Sources */,
+				A0000000000000000000010B /* CameraPreviewView.swift in Sources */,
+				A0000000000000000000012F /* CaptureOrchestrator.swift in Sources */,
+				A0000000000000000000010C /* CameraSessionController.swift in Sources */,
+				A0000000000000000000010E /* PoseLandmarkName.swift in Sources */,
+				A0000000000000000000010F /* PoseLandmark.swift in Sources */,
+				A00000000000000000000110 /* PoseFrame.swift in Sources */,
+				A00000000000000000000111 /* ShotTemplate.swift in Sources */,
+				A00000000000000000000119 /* CoachPersona.swift in Sources */,
+				A0000000000000000000011A /* CoachingTypes.swift in Sources */,
+				A00000000000000000000124 /* CaptureSession.swift in Sources */,
+				A00000000000000000000121 /* CropPreview.swift in Sources */,
+				A00000000000000000000126 /* CropPreviewPicker.swift in Sources */,
+				A00000000000000000000112 /* PoseFrameMapper.swift in Sources */,
+				A00000000000000000000113 /* PoseDetectionService.swift in Sources */,
+				A0000000000000000000011B /* FrameScoringEngine.swift in Sources */,
+				A00000000000000000000122 /* LightingAnalysis.swift in Sources */,
+				A0000000000000000000012B /* LightingAnalysisService.swift in Sources */,
+				A00000000000000000000127 /* LevelGuideView.swift in Sources */,
+				A00000000000000000000123 /* MotionGuidance.swift in Sources */,
+				A0000000000000000000012C /* MotionGuidanceService.swift in Sources */,
+				A0000000000000000000011C /* PromptSelectionEngine.swift in Sources */,
+				A0000000000000000000011D /* CoachingPipeline.swift in Sources */,
+				A00000000000000000000114 /* PoseDebugOverlayView.swift in Sources */,
+				A0000000000000000000012E /* PhotoLibraryExporter.swift in Sources */,
+				A00000000000000000000128 /* CropPreviewMaskView.swift in Sources */,
+				A00000000000000000000129 /* ReviewScreen.swift in Sources */,
+				A0000000000000000000012A /* HistoryScreen.swift in Sources */,
+				A0000000000000000000012D /* SessionStore.swift in Sources */,
+				A00000000000000000000115 /* ShotTemplateOverlayView.swift in Sources */,
+				A00000000000000000000116 /* ShotTemplatePicker.swift in Sources */,
+				A0000000000000000000011E /* CoachPersonaPicker.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000091 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0000000000000000000010D /* CameraOrientationMapperTests.swift in Sources */,
+				A00000000000000000000130 /* CaptureSessionRecordTests.swift in Sources */,
+				A00000000000000000000131 /* CropPreviewConfigurationTests.swift in Sources */,
+				A0000000000000000000011F /* FrameScoringEngineTests.swift in Sources */,
+				A00000000000000000000117 /* PoseFrameMapperTests.swift in Sources */,
+				A00000000000000000000120 /* PromptSelectionEngineTests.swift in Sources */,
+				A00000000000000000000118 /* ShotTemplateRegistryTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A00000000000000000000071 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A00000000000000000000020 /* BoyfriendCamNative */;
+			targetProxy = A00000000000000000000070 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A000000000000000000000B0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A000000000000000000000B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A000000000000000000000B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000035 /* BoyfriendCamNative.app.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DU67XDPU37;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A000000000000000000000B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000035 /* BoyfriendCamNative.app.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DU67XDPU37;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A000000000000000000000B4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000039 /* BoyfriendCamNative.tests.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DU67XDPU37;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_TESTING_SEARCH_PATHS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_TEST_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BoyfriendCamNative.app/BoyfriendCamNative";
+				TEST_TARGET_NAME = BoyfriendCamNative;
+			};
+			name = Debug;
+		};
+		A000000000000000000000B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000039 /* BoyfriendCamNative.tests.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DU67XDPU37;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_TEST_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BoyfriendCamNative.app/BoyfriendCamNative";
+				TEST_TARGET_NAME = BoyfriendCamNative;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A000000000000000000000A0 /* Build configuration list for PBXNativeTarget "BoyfriendCamNative" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A000000000000000000000B2 /* Debug */,
+				A000000000000000000000B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A000000000000000000000A1 /* Build configuration list for PBXNativeTarget "BoyfriendCamNativeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A000000000000000000000B4 /* Debug */,
+				A000000000000000000000B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A000000000000000000000A2 /* Build configuration list for PBXProject "BoyfriendCamNative" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A000000000000000000000B0 /* Debug */,
+				A000000000000000000000B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A00000000000000000000001 /* Project object */;
+}

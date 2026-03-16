@@ -40,5 +40,11 @@ yarn-error.*
 /ios
 /android
 
+# local native iOS signing overrides
+Config/BoyfriendCamNative.local.xcconfig
+
+# local Xcode user data
+BoyfriendCamNative.xcodeproj/project.xcworkspace/xcuserdata/
+
 # unrelated sibling project
 /atlas
