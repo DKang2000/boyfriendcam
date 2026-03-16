@@ -31,56 +31,56 @@
 
 ## Milestone 2: Camera Shell and Overlay System
 
-- [ ] Run design-alignment pass if `/reference` is added before UI work
+- [x] Run design-alignment pass if `/reference` is added before UI work
 - [x] Implement camera permissions and preview shell
 - [x] Build shot template selector
 - [x] Define `ShotTemplate` configs for all MVP shot types
-- [ ] Define `CropMask` configs for `1:1`, `4:5`, `9:16`
+- [x] Define `CropMask` configs for `1:1`, `4:5`, `9:16`
 - [x] Render ghost silhouette overlays per shot type
 - [x] Render crosshair / thirds guides
 - [x] Build prompt bar and ready-state chrome
-- [ ] Build mocked analyzer feed for UI development
+- [x] Build mocked analyzer feed for UI development
 - [x] Preserve the pose debug overlay behind a dev-only toggle for QA
 
 ## Milestone 3: Deterministic Analysis Pipeline
 
-- [ ] Define analyzer interfaces and typed score payloads
-- [ ] Implement pose/framing adapter abstraction
-- [ ] Implement centeredness scoring
-- [ ] Implement headroom scoring
-- [ ] Implement feet visibility scoring for `full_body`
-- [ ] Implement eye-line scoring for portrait-oriented templates
-- [ ] Implement subject-size scoring
-- [ ] Implement shoulder balance / symmetry scoring
-- [ ] Implement pitch / tilt scoring
+- [x] Define analyzer interfaces and typed score payloads
+- [x] Implement pose/framing adapter abstraction
+- [x] Implement centeredness scoring
+- [x] Implement headroom scoring
+- [x] Implement feet visibility scoring for `full_body`
+- [x] Implement eye-line scoring for portrait-oriented templates
+- [x] Implement subject-size scoring
+- [x] Implement shoulder balance / symmetry scoring
+- [x] Implement pitch / tilt scoring
 - [ ] Implement lower-angle recommendation heuristic
-- [ ] Implement crop-safety scoring for IG masks
-- [ ] Implement confidence smoothing over time
-- [ ] Implement lighting analyzer heuristics
-- [ ] Implement orientation normalization and upside-down support
+- [x] Implement crop-safety scoring for IG masks
+- [x] Implement confidence smoothing over time
+- [x] Implement lighting analyzer heuristics
+- [x] Implement orientation normalization and upside-down support
 
 ## Milestone 4: Guidance and Persona Output
 
-- [ ] Define `CoachPersonaPack` configs for `nice`, `sassy`, `mean`
-- [ ] Define `GuidanceRule` configs mapped to score dimensions
-- [ ] Implement guidance rule engine
-- [ ] Implement prompt prioritization and debounce behavior
-- [ ] Add optional spoken prompts
-- [ ] Ensure text prompts remain visible during voice guidance
-- [ ] Bind ready-state UI to score thresholds
+- [x] Define `CoachPersonaPack` configs for `nice`, `sassy`, `mean`
+- [x] Define `GuidanceRule` configs mapped to score dimensions
+- [x] Implement guidance rule engine
+- [x] Implement prompt prioritization and debounce behavior
+- [x] Add optional spoken prompts
+- [x] Ensure text prompts remain visible during voice guidance
+- [x] Bind ready-state UI to score thresholds
 
 ## Milestone 5: Capture, Save, and History
 
-- [ ] Implement single capture
-- [ ] Implement burst counts `3`, `5`, `10`
-- [ ] Implement capture queueing/orchestration
-- [ ] Implement local save flow
-- [ ] Persist session metadata for history
-- [ ] Build history screen
-- [ ] Build post-capture or pre-capture IG preview flow
-- [ ] Validate permission minimization
-- [ ] Store only saved-photo references and lightweight shot metadata
-- [ ] Avoid raw frame-by-frame analysis persistence and duplicate full-size image storage
+- [x] Implement single capture
+- [x] Implement burst counts `3`, `5`, `10`
+- [x] Implement capture queueing/orchestration
+- [x] Implement local save flow
+- [x] Persist session metadata for history
+- [x] Build history screen
+- [x] Build post-capture or pre-capture IG preview flow
+- [x] Validate permission minimization
+- [x] Store only saved-photo references and lightweight shot metadata
+- [x] Avoid raw frame-by-frame analysis persistence and duplicate full-size image storage
 
 ## Milestone 6: Release Setup and Compliance
 
@@ -97,5 +97,20 @@
 
 - [ ] Append `VIBECODE_LOG.md` after each milestone
 - [ ] Save main execution prompts under `PROMPTS/`
-- [ ] Run lint/tests after each milestone
-- [ ] Stop for review after each milestone
+- [x] Run lint/tests after each milestone
+- [x] Stop for review after each milestone
+
+## Native iOS Rewrite
+
+- [x] Inspect `reference/*`, milestone docs, QA docs, and current RN behavior sources before planning
+- [x] Create `ios-native/AGENTS.md`
+- [x] Create `ios-native/Prompt.md`
+- [x] Create `ios-native/Plan.md`
+- [x] Create `ios-native/Documentation.md`
+- [x] Create `ios-native/MigrationParity.md`
+- [ ] iOS-0: native scaffold + camera shell
+- [ ] iOS-1: pose pipeline + overlay/template parity
+- [ ] iOS-2: scoring/guidance/persona parity
+- [ ] iOS-3: lighting/level/burst/crop/history parity
+- [ ] iOS-4: pixel polish + performance hardening + release prep
+- [ ] Run native hardware QA for upright portrait and portrait-upside-down before release signoff
