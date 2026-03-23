@@ -21,6 +21,18 @@ struct PoseBodyDescriptor: Equatable {
     let subjectBounds: CGRect
     let confidence: CGFloat
     let hasLowerBodyAnchors: Bool
+    let leftShoulder: CGPoint
+    let rightShoulder: CGPoint
+    let leftElbow: CGPoint
+    let rightElbow: CGPoint
+    let leftWrist: CGPoint
+    let rightWrist: CGPoint
+    let leftHip: CGPoint
+    let rightHip: CGPoint
+    let leftKnee: CGPoint
+    let rightKnee: CGPoint
+    let leftAnkle: CGPoint
+    let rightAnkle: CGPoint
 
     func blended(toward target: PoseBodyDescriptor, factor: CGFloat) -> PoseBodyDescriptor {
         let resolvedFactor = min(max(factor, 0), 1)
@@ -41,7 +53,19 @@ struct PoseBodyDescriptor: Equatable {
                 height: interpolated(from: subjectBounds.height, to: target.subjectBounds.height, factor: resolvedFactor)
             ),
             confidence: interpolated(from: confidence, to: target.confidence, factor: resolvedFactor),
-            hasLowerBodyAnchors: target.hasLowerBodyAnchors
+            hasLowerBodyAnchors: target.hasLowerBodyAnchors,
+            leftShoulder: interpolated(from: leftShoulder, to: target.leftShoulder, factor: resolvedFactor),
+            rightShoulder: interpolated(from: rightShoulder, to: target.rightShoulder, factor: resolvedFactor),
+            leftElbow: interpolated(from: leftElbow, to: target.leftElbow, factor: resolvedFactor),
+            rightElbow: interpolated(from: rightElbow, to: target.rightElbow, factor: resolvedFactor),
+            leftWrist: interpolated(from: leftWrist, to: target.leftWrist, factor: resolvedFactor),
+            rightWrist: interpolated(from: rightWrist, to: target.rightWrist, factor: resolvedFactor),
+            leftHip: interpolated(from: leftHip, to: target.leftHip, factor: resolvedFactor),
+            rightHip: interpolated(from: rightHip, to: target.rightHip, factor: resolvedFactor),
+            leftKnee: interpolated(from: leftKnee, to: target.leftKnee, factor: resolvedFactor),
+            rightKnee: interpolated(from: rightKnee, to: target.rightKnee, factor: resolvedFactor),
+            leftAnkle: interpolated(from: leftAnkle, to: target.leftAnkle, factor: resolvedFactor),
+            rightAnkle: interpolated(from: rightAnkle, to: target.rightAnkle, factor: resolvedFactor)
         )
     }
 
@@ -79,176 +103,11 @@ extension PoseFrame {
     }
 
     func bodyDescriptor(for template: ShotTemplate) -> PoseBodyDescriptor? {
-        guard
-            let leftShoulder = landmarks[.leftShoulder],
-            let rightShoulder = landmarks[.rightShoulder]
-        else {
-            return nil
-        }
-
-        let shoulderCenter = midpoint(leftShoulder, rightShoulder)
-        let shoulderWidth = abs(rightShoulder.x - leftShoulder.x)
-        let minimumTorsoHeight: CGFloat = template.id == .portrait ? 0.08 : 0.10
-        let allowsCroppedTorso = allowsInferredHips(for: template)
-
-        guard shoulderWidth >= 0.08 else {
-            return nil
-        }
-
-        guard let resolvedHips = resolvedHipPair(
-            template: template,
-            shoulderCenter: shoulderCenter,
-            shoulderWidth: shoulderWidth
-        ) else {
-            return nil
-        }
-
-        let hipCenter = midpoint(resolvedHips.left, resolvedHips.right)
-        let hipWidth = abs(resolvedHips.right.x - resolvedHips.left.x)
-        let torsoHeight = abs(hipCenter.y - shoulderCenter.y)
-        let torsoLean = abs(shoulderCenter.x - hipCenter.x)
-        let torsoConfidence = averageConfidence([leftShoulder, rightShoulder] + resolvedHips.confidenceLandmarks)
-        let minimumConfidence: CGFloat = allowsCroppedTorso ? 0.34 : 0.45
-
-        guard
-            torsoConfidence >= minimumConfidence,
-            hipWidth >= 0.05,
-            torsoHeight >= minimumTorsoHeight,
-            torsoHeight <= 0.62,
-            torsoLean <= max(shoulderWidth, hipWidth) * (allowsCroppedTorso ? 0.9 : 0.7)
-        else {
-            return nil
-        }
-
-        let headCenter = resolvedHeadCenter(shoulderCenter: shoulderCenter)
-        let eyeSpan = resolvedEyeSpan()
-        let headWidth = max(shoulderWidth * 0.52, hipWidth * 0.44, eyeSpan * 2.7, 0.06)
-        let topY = max(headCenter.y - headWidth * 0.64, 0)
-        let lowerBodyAnchor = resolvedLowerBodyAnchor(hipCenterY: hipCenter.y, torsoHeight: torsoHeight)
-
-        let bottomY: CGFloat
-        switch template.id {
-        case .portrait:
-            bottomY = min(hipCenter.y + torsoHeight * 0.18, 1)
-        case .halfBody:
-            bottomY = min(hipCenter.y + torsoHeight * 0.58, 1)
-        default:
-            bottomY = min(max(lowerBodyAnchor.y, hipCenter.y + torsoHeight * 1.1), 1)
-        }
-
-        let subjectHeight = max(bottomY - topY, torsoHeight * (template.id == .portrait ? 1.35 : 1.7))
-        let bodyWidth = min(max(max(shoulderWidth * 1.18, hipWidth * 1.26), 0.16), 0.76)
-        let centerX = clamp((shoulderCenter.x + hipCenter.x) * 0.5)
-        let subjectCenter = CGPoint(
-            x: centerX,
-            y: clamp((headCenter.y + shoulderCenter.y + hipCenter.y) / 3)
-        )
-        let subjectBounds = CGRect(
-            x: clamp(centerX - bodyWidth * 0.5),
-            y: topY,
-            width: min(bodyWidth, 1),
-            height: min(subjectHeight, 1 - topY)
-        )
-
-        guard
-            subjectBounds.height >= 0.18,
-            subjectBounds.maxY <= 1.001,
-            subjectBounds.minY >= -0.001
-        else {
-            return nil
-        }
-
-        let lowerBodyConfidence = averageConfidence(lowerBodyAnchor.landmarks)
-        let blendedConfidence = torsoConfidence * 0.80 + lowerBodyConfidence * 0.20
-
-        return PoseBodyDescriptor(
-            headCenter: headCenter,
-            shoulderCenter: shoulderCenter,
-            hipCenter: hipCenter,
-            subjectCenter: subjectCenter,
-            footY: bottomY,
-            shoulderWidth: shoulderWidth,
-            hipWidth: hipWidth,
-            headWidth: headWidth,
-            subjectBounds: subjectBounds,
-            confidence: blendedConfidence,
-            hasLowerBodyAnchors: lowerBodyAnchor.hasAnchors
-        )
+        adaptiveBodyDescriptor()
     }
 
     func coachBodyDescriptor() -> PoseBodyDescriptor? {
-        let coachTemplate = ShotTemplateRegistry.template(for: .halfBody)
-
-        guard
-            let leftShoulder = landmarks[.leftShoulder],
-            let rightShoulder = landmarks[.rightShoulder],
-            let resolvedHips = resolvedHipPair(
-                template: coachTemplate,
-                shoulderCenter: midpoint(leftShoulder, rightShoulder),
-                shoulderWidth: abs(rightShoulder.x - leftShoulder.x)
-            )
-        else {
-            return nil
-        }
-
-        let shoulderCenter = midpoint(leftShoulder, rightShoulder)
-        let shoulderWidth = abs(rightShoulder.x - leftShoulder.x)
-        let hipCenter = midpoint(resolvedHips.left, resolvedHips.right)
-        let hipWidth = abs(resolvedHips.right.x - resolvedHips.left.x)
-        let torsoHeight = abs(hipCenter.y - shoulderCenter.y)
-        let torsoConfidence = averageConfidence([leftShoulder, rightShoulder] + resolvedHips.confidenceLandmarks)
-
-        guard
-            shoulderWidth >= 0.08,
-            hipWidth >= 0.05,
-            torsoHeight >= 0.10,
-            torsoHeight <= 0.62,
-            torsoConfidence >= 0.34
-        else {
-            return nil
-        }
-
-        let headCenter = resolvedHeadCenter(shoulderCenter: shoulderCenter)
-        let eyeSpan = resolvedEyeSpan()
-        let headWidth = max(shoulderWidth * 0.52, hipWidth * 0.44, eyeSpan * 2.7, 0.06)
-        let topY = max(headCenter.y - headWidth * 0.64, 0)
-        let lowerBodyAnchor = resolvedLowerBodyAnchor(hipCenterY: hipCenter.y, torsoHeight: torsoHeight)
-        let inferredBottomY = hipCenter.y + torsoHeight * (lowerBodyAnchor.hasAnchors ? 1.10 : 0.88)
-        let bottomY = min(max(lowerBodyAnchor.y, inferredBottomY), 1)
-        let subjectHeight = max(bottomY - topY, torsoHeight * 1.65)
-        let bodyWidth = min(max(max(shoulderWidth * 1.18, hipWidth * 1.26), 0.16), 0.76)
-        let centerX = clamp((shoulderCenter.x + hipCenter.x) * 0.5)
-        let subjectCenter = CGPoint(
-            x: centerX,
-            y: clamp((headCenter.y + shoulderCenter.y + hipCenter.y) / 3)
-        )
-        let subjectBounds = CGRect(
-            x: clamp(centerX - bodyWidth * 0.5),
-            y: topY,
-            width: min(bodyWidth, 1),
-            height: min(subjectHeight, 1 - topY)
-        )
-
-        guard subjectBounds.height >= 0.18 else {
-            return nil
-        }
-
-        let lowerBodyConfidence = averageConfidence(lowerBodyAnchor.landmarks)
-        let blendedConfidence = torsoConfidence * 0.82 + lowerBodyConfidence * 0.18
-
-        return PoseBodyDescriptor(
-            headCenter: headCenter,
-            shoulderCenter: shoulderCenter,
-            hipCenter: hipCenter,
-            subjectCenter: subjectCenter,
-            footY: bottomY,
-            shoulderWidth: shoulderWidth,
-            hipWidth: hipWidth,
-            headWidth: headWidth,
-            subjectBounds: subjectBounds,
-            confidence: blendedConfidence,
-            hasLowerBodyAnchors: lowerBodyAnchor.hasAnchors
-        )
+        adaptiveBodyDescriptor()
     }
 
     func eyeCenter() -> CGPoint? {
@@ -264,6 +123,165 @@ extension PoseFrame {
 
     func eyeSpan() -> CGFloat {
         resolvedEyeSpan()
+    }
+
+    private func adaptiveBodyDescriptor() -> PoseBodyDescriptor? {
+        guard
+            let leftShoulderLandmark = landmarks[.leftShoulder],
+            let rightShoulderLandmark = landmarks[.rightShoulder]
+        else {
+            return nil
+        }
+
+        let leftShoulder = point(from: leftShoulderLandmark)
+        let rightShoulder = point(from: rightShoulderLandmark)
+        let shoulderCenter = midpoint(leftShoulder, rightShoulder)
+        let shoulderWidth = distance(leftShoulder, rightShoulder)
+
+        guard shoulderWidth >= 0.06 else {
+            return nil
+        }
+
+        let resolvedHips = resolvedHipPair(
+            shoulderCenter: shoulderCenter,
+            shoulderWidth: shoulderWidth
+        )
+        let leftHip = point(from: resolvedHips.left)
+        let rightHip = point(from: resolvedHips.right)
+        let hipCenter = midpoint(leftHip, rightHip)
+        let hipWidth = max(distance(leftHip, rightHip), shoulderWidth * 0.62)
+        let torsoHeight = max(abs(hipCenter.y - shoulderCenter.y), shoulderWidth * 0.78)
+        let torsoLean = abs(shoulderCenter.x - hipCenter.x)
+        let torsoConfidence = averageConfidence([leftShoulderLandmark, rightShoulderLandmark] + resolvedHips.confidenceLandmarks)
+
+        guard
+            hipWidth >= 0.04,
+            torsoHeight >= 0.08,
+            torsoHeight <= 0.72,
+            torsoConfidence >= 0.20,
+            torsoLean <= max(shoulderWidth, hipWidth) * 1.05
+        else {
+            return nil
+        }
+
+        let headCenter = resolvedHeadCenter(shoulderCenter: shoulderCenter)
+        let headWidth = max(shoulderWidth * 0.52, hipWidth * 0.44, resolvedEyeSpan() * 2.7, 0.06)
+        let leftArm = resolvedArm(
+            side: .left,
+            shoulder: leftShoulder,
+            shoulderWidth: shoulderWidth,
+            torsoHeight: torsoHeight
+        )
+        let rightArm = resolvedArm(
+            side: .right,
+            shoulder: rightShoulder,
+            shoulderWidth: shoulderWidth,
+            torsoHeight: torsoHeight
+        )
+        let leftLeg = resolvedLeg(
+            side: .left,
+            hip: leftHip,
+            hipWidth: hipWidth,
+            torsoHeight: torsoHeight
+        )
+        let rightLeg = resolvedLeg(
+            side: .right,
+            hip: rightHip,
+            hipWidth: hipWidth,
+            torsoHeight: torsoHeight
+        )
+
+        let topY = max(headCenter.y - headWidth * 0.64, 0)
+        let inferredFootY = hipCenter.y + torsoHeight * 1.36
+        let bottomY = min(
+            max(
+                leftLeg.ankle.y,
+                rightLeg.ankle.y,
+                inferredFootY
+            ),
+            1
+        )
+
+        let rawMinX = min(
+            headCenter.x - headWidth * 0.52,
+            leftShoulder.x,
+            rightShoulder.x,
+            leftHip.x,
+            rightHip.x,
+            leftLeg.knee.x,
+            rightLeg.knee.x,
+            leftLeg.ankle.x,
+            rightLeg.ankle.x
+        )
+        let rawMaxX = max(
+            headCenter.x + headWidth * 0.52,
+            leftShoulder.x,
+            rightShoulder.x,
+            leftHip.x,
+            rightHip.x,
+            leftLeg.knee.x,
+            rightLeg.knee.x,
+            leftLeg.ankle.x,
+            rightLeg.ankle.x
+        )
+        let horizontalPadding = max(shoulderWidth * 0.14, hipWidth * 0.10, 0.04)
+        let minX = clamp(rawMinX - horizontalPadding)
+        let maxX = clamp(rawMaxX + horizontalPadding)
+        let subjectHeight = min(max(bottomY - topY, torsoHeight * 1.35), 1 - topY)
+        let subjectWidth = min(max(maxX - minX, 0.14), 1 - minX)
+        let subjectBounds = CGRect(
+            x: minX,
+            y: topY,
+            width: subjectWidth,
+            height: subjectHeight
+        )
+
+        guard subjectBounds.height >= 0.18 else {
+            return nil
+        }
+
+        let subjectCenter = CGPoint(
+            x: clamp((headCenter.x + shoulderCenter.x + hipCenter.x) / 3),
+            y: clamp((headCenter.y + shoulderCenter.y + hipCenter.y) / 3)
+        )
+        let lowerBodyConfidenceLandmarks = leftLeg.confidenceLandmarks + rightLeg.confidenceLandmarks
+        let actualConfidenceLandmarks =
+            [leftShoulderLandmark, rightShoulderLandmark] +
+            resolvedHips.confidenceLandmarks +
+            leftArm.confidenceLandmarks +
+            rightArm.confidenceLandmarks +
+            lowerBodyConfidenceLandmarks
+        let actualCoverage = CGFloat(actualConfidenceLandmarks.count) / 12
+        let blendedConfidence = min(
+            1,
+            averageConfidence(actualConfidenceLandmarks) * 0.78 + actualCoverage * 0.22
+        )
+
+        return PoseBodyDescriptor(
+            headCenter: headCenter,
+            shoulderCenter: shoulderCenter,
+            hipCenter: hipCenter,
+            subjectCenter: subjectCenter,
+            footY: bottomY,
+            shoulderWidth: shoulderWidth,
+            hipWidth: hipWidth,
+            headWidth: headWidth,
+            subjectBounds: subjectBounds,
+            confidence: blendedConfidence,
+            hasLowerBodyAnchors: !lowerBodyConfidenceLandmarks.isEmpty,
+            leftShoulder: leftShoulder,
+            rightShoulder: rightShoulder,
+            leftElbow: leftArm.elbow,
+            rightElbow: rightArm.elbow,
+            leftWrist: leftArm.wrist,
+            rightWrist: rightArm.wrist,
+            leftHip: leftHip,
+            rightHip: rightHip,
+            leftKnee: leftLeg.knee,
+            rightKnee: rightLeg.knee,
+            leftAnkle: leftLeg.ankle,
+            rightAnkle: rightLeg.ankle
+        )
     }
 
     private func resolvedHeadCenter(shoulderCenter: CGPoint) -> CGPoint {
@@ -307,50 +325,15 @@ extension PoseFrame {
         return 0
     }
 
-    private func resolvedLowerBodyAnchor(
-        hipCenterY: CGFloat,
-        torsoHeight: CGFloat
-    ) -> (y: CGFloat, landmarks: [PoseLandmark], hasAnchors: Bool) {
-        if
-            let leftAnkle = landmarks[.leftAnkle] ?? landmarks[.leftHeel],
-            let rightAnkle = landmarks[.rightAnkle] ?? landmarks[.rightHeel]
-        {
-            return (max(leftAnkle.y, rightAnkle.y), [leftAnkle, rightAnkle], true)
-        }
-
-        if
-            let leftKnee = landmarks[.leftKnee],
-            let rightKnee = landmarks[.rightKnee]
-        {
-            return (max(leftKnee.y, rightKnee.y) + torsoHeight * 0.72, [leftKnee, rightKnee], true)
-        }
-
-        if let oneKnee = landmarks[.leftKnee] ?? landmarks[.rightKnee] {
-            return (oneKnee.y + torsoHeight * 0.84, [oneKnee], true)
-        }
-
-        if let oneAnkle = landmarks[.leftAnkle] ?? landmarks[.rightAnkle] ?? landmarks[.leftHeel] ?? landmarks[.rightHeel] {
-            return (oneAnkle.y, [oneAnkle], true)
-        }
-
-        let inferredY = max(hipCenterY + torsoHeight * 1.42, 0)
-        return (inferredY, [], false)
-    }
-
     private func resolvedHipPair(
-        template: ShotTemplate,
         shoulderCenter: CGPoint,
         shoulderWidth: CGFloat
-    ) -> (left: PoseLandmark, right: PoseLandmark, confidenceLandmarks: [PoseLandmark])? {
+    ) -> (left: PoseLandmark, right: PoseLandmark, confidenceLandmarks: [PoseLandmark]) {
         if
             let leftHip = landmarks[.leftHip],
             let rightHip = landmarks[.rightHip]
         {
             return (leftHip, rightHip, [leftHip, rightHip])
-        }
-
-        guard allowsInferredHips(for: template) else {
-            return nil
         }
 
         let inferredTorsoHeight = max(shoulderWidth * 0.92, 0.15)
@@ -359,13 +342,13 @@ extension PoseFrame {
 
         if let leftHip = landmarks[.leftHip] {
             let mirroredX = clamp(shoulderCenter.x + (shoulderCenter.x - leftHip.x))
-            let rightHip = PoseLandmark(x: mirroredX, y: defaultY, confidence: leftHip.confidence)
+            let rightHip = PoseLandmark(x: mirroredX, y: leftHip.y, confidence: leftHip.confidence * 0.88)
             return (leftHip, rightHip, [leftHip])
         }
 
         if let rightHip = landmarks[.rightHip] {
             let mirroredX = clamp(shoulderCenter.x - (rightHip.x - shoulderCenter.x))
-            let leftHip = PoseLandmark(x: mirroredX, y: defaultY, confidence: rightHip.confidence)
+            let leftHip = PoseLandmark(x: mirroredX, y: rightHip.y, confidence: rightHip.confidence * 0.88)
             return (leftHip, rightHip, [rightHip])
         }
 
@@ -382,16 +365,116 @@ extension PoseFrame {
         return (leftHip, rightHip, [])
     }
 
-    private func allowsInferredHips(for template: ShotTemplate) -> Bool {
-        switch template.id {
-        case .portrait, .halfBody, .ruleOfThirds:
-            return true
-        case .fullBody, .outfit, .instagramStory:
-            return false
+    private func resolvedArm(
+        side: PoseSide,
+        shoulder: CGPoint,
+        shoulderWidth: CGFloat,
+        torsoHeight: CGFloat
+    ) -> (elbow: CGPoint, wrist: CGPoint, confidenceLandmarks: [PoseLandmark]) {
+        let elbowLandmark = landmarks[side.elbow]
+        let wristLandmark = landmarks[side.wrist]
+            ?? landmarks[side.index]
+            ?? landmarks[side.pinky]
+            ?? landmarks[side.thumb]
+        let lateralDirection: CGFloat = side == .left ? -1 : 1
+        let defaultElbow = CGPoint(
+            x: clamp(shoulder.x + shoulderWidth * 0.26 * lateralDirection),
+            y: clamp(shoulder.y + torsoHeight * 0.54)
+        )
+        let defaultWrist = CGPoint(
+            x: clamp(shoulder.x + shoulderWidth * 0.32 * lateralDirection),
+            y: clamp(shoulder.y + torsoHeight * 0.94)
+        )
+
+        let elbow: CGPoint
+        let wrist: CGPoint
+
+        switch (elbowLandmark, wristLandmark) {
+        case let (elbowLandmark?, wristLandmark?):
+            elbow = point(from: elbowLandmark)
+            wrist = point(from: wristLandmark)
+        case let (elbowLandmark?, nil):
+            elbow = point(from: elbowLandmark)
+            let shoulderToElbow = CGPoint(x: elbow.x - shoulder.x, y: elbow.y - shoulder.y)
+            wrist = clampedPoint(
+                CGPoint(
+                    x: elbow.x + shoulderToElbow.x * 0.88,
+                    y: elbow.y + shoulderToElbow.y * 0.88
+                )
+            )
+        case let (nil, wristLandmark?):
+            wrist = point(from: wristLandmark)
+            elbow = clampedPoint(
+                CGPoint(
+                    x: shoulder.x + (wrist.x - shoulder.x) * 0.54,
+                    y: shoulder.y + (wrist.y - shoulder.y) * 0.54
+                )
+            )
+        case (nil, nil):
+            elbow = defaultElbow
+            wrist = defaultWrist
         }
+
+        return (elbow, wrist, [elbowLandmark, wristLandmark].compactMap { $0 })
+    }
+
+    private func resolvedLeg(
+        side: PoseSide,
+        hip: CGPoint,
+        hipWidth: CGFloat,
+        torsoHeight: CGFloat
+    ) -> (knee: CGPoint, ankle: CGPoint, confidenceLandmarks: [PoseLandmark]) {
+        let kneeLandmark = landmarks[side.knee]
+        let ankleLandmark = landmarks[side.ankle]
+            ?? landmarks[side.heel]
+            ?? landmarks[side.footIndex]
+        let lateralDirection: CGFloat = side == .left ? -1 : 1
+        let defaultKnee = CGPoint(
+            x: clamp(hip.x + hipWidth * 0.08 * lateralDirection),
+            y: clamp(hip.y + torsoHeight * 0.90)
+        )
+        let defaultAnkle = CGPoint(
+            x: clamp(hip.x + hipWidth * 0.12 * lateralDirection),
+            y: clamp(hip.y + torsoHeight * 1.68)
+        )
+
+        let knee: CGPoint
+        let ankle: CGPoint
+
+        switch (kneeLandmark, ankleLandmark) {
+        case let (kneeLandmark?, ankleLandmark?):
+            knee = point(from: kneeLandmark)
+            ankle = point(from: ankleLandmark)
+        case let (kneeLandmark?, nil):
+            knee = point(from: kneeLandmark)
+            let hipToKnee = CGPoint(x: knee.x - hip.x, y: knee.y - hip.y)
+            ankle = clampedPoint(
+                CGPoint(
+                    x: knee.x + hipToKnee.x * 0.78,
+                    y: max(knee.y + torsoHeight * 0.58, knee.y + hipToKnee.y * 0.78)
+                )
+            )
+        case let (nil, ankleLandmark?):
+            ankle = point(from: ankleLandmark)
+            knee = clampedPoint(
+                CGPoint(
+                    x: hip.x + (ankle.x - hip.x) * 0.52,
+                    y: hip.y + (ankle.y - hip.y) * 0.50
+                )
+            )
+        case (nil, nil):
+            knee = defaultKnee
+            ankle = defaultAnkle
+        }
+
+        return (knee, ankle, [kneeLandmark, ankleLandmark].compactMap { $0 })
     }
 
     private func midpoint(_ lhs: PoseLandmark, _ rhs: PoseLandmark) -> CGPoint {
+        CGPoint(x: (lhs.x + rhs.x) * 0.5, y: (lhs.y + rhs.y) * 0.5)
+    }
+
+    private func midpoint(_ lhs: CGPoint, _ rhs: CGPoint) -> CGPoint {
         CGPoint(x: (lhs.x + rhs.x) * 0.5, y: (lhs.y + rhs.y) * 0.5)
     }
 
@@ -410,11 +493,105 @@ extension PoseFrame {
         hypot(lhs.x - rhs.x, lhs.y - rhs.y)
     }
 
+    private func distance(_ lhs: CGPoint, _ rhs: CGPoint) -> CGFloat {
+        hypot(lhs.x - rhs.x, lhs.y - rhs.y)
+    }
+
+    private func point(from landmark: PoseLandmark) -> CGPoint {
+        CGPoint(x: landmark.x, y: landmark.y)
+    }
+
     private func clamp(_ value: CGFloat) -> CGFloat {
         min(max(value, 0), 1)
     }
 
     private func clampedPoint(_ point: CGPoint) -> CGPoint {
         CGPoint(x: clamp(point.x), y: clamp(point.y))
+    }
+}
+
+private enum PoseSide {
+    case left
+    case right
+
+    var elbow: PoseLandmarkName {
+        switch self {
+        case .left:
+            return .leftElbow
+        case .right:
+            return .rightElbow
+        }
+    }
+
+    var wrist: PoseLandmarkName {
+        switch self {
+        case .left:
+            return .leftWrist
+        case .right:
+            return .rightWrist
+        }
+    }
+
+    var thumb: PoseLandmarkName {
+        switch self {
+        case .left:
+            return .leftThumb
+        case .right:
+            return .rightThumb
+        }
+    }
+
+    var index: PoseLandmarkName {
+        switch self {
+        case .left:
+            return .leftIndex
+        case .right:
+            return .rightIndex
+        }
+    }
+
+    var pinky: PoseLandmarkName {
+        switch self {
+        case .left:
+            return .leftPinky
+        case .right:
+            return .rightPinky
+        }
+    }
+
+    var knee: PoseLandmarkName {
+        switch self {
+        case .left:
+            return .leftKnee
+        case .right:
+            return .rightKnee
+        }
+    }
+
+    var ankle: PoseLandmarkName {
+        switch self {
+        case .left:
+            return .leftAnkle
+        case .right:
+            return .rightAnkle
+        }
+    }
+
+    var heel: PoseLandmarkName {
+        switch self {
+        case .left:
+            return .leftHeel
+        case .right:
+            return .rightHeel
+        }
+    }
+
+    var footIndex: PoseLandmarkName {
+        switch self {
+        case .left:
+            return .leftFootIndex
+        case .right:
+            return .rightFootIndex
+        }
     }
 }

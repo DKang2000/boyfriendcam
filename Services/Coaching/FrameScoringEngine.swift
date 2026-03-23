@@ -35,27 +35,6 @@ enum FrameScoringEngine {
             )
         }
 
-        guard !requiresLowerBodyAnchors(template) || descriptor.hasLowerBodyAnchors else {
-            return FrameAnalysis(
-                metrics: FramingMetrics(
-                    visibleLandmarkCount: 0,
-                    requiredLandmarkRatio: 0,
-                    centerXOffset: 0,
-                    centerYOffset: 0,
-                    subjectHeightRatio: 0,
-                    targetCenter: targetCenter,
-                    subjectCenter: nil,
-                    subjectBounds: nil
-                ),
-                scores: FrameScoreBreakdown(
-                    centerScore: 0,
-                    requiredScore: 0,
-                    coverageScore: 0,
-                    totalScore: 0
-                )
-            )
-        }
-
         let bounds = subjectBounds(for: descriptor, template: template)
         let subjectCenter = subjectCenter(for: descriptor, template: template)
         let centerXOffset = subjectCenter.x - targetCenter.x
@@ -73,7 +52,10 @@ enum FrameScoringEngine {
             offset: centerYOffset,
             tolerance: template.scoring.verticalTolerance
         ) * 0.5
-        let requiredScore = requiredRatio
+        let requiredScore =
+            isMissingCriticalLowerBodyLandmarks(template: template, landmarks: poseFrame.landmarks)
+            ? 0
+            : requiredRatio
         let coverageScore = coverageScore(
             template: template,
             visibleLandmarkCount: poseFrame.visibleLandmarkCount,
@@ -142,15 +124,40 @@ enum FrameScoringEngine {
                 y: (descriptor.headCenter.y + descriptor.shoulderCenter.y + descriptor.hipCenter.y) / 3
             )
         default:
-            return descriptor.subjectCenter
+            return CGPoint(
+                x: descriptor.subjectBounds.midX,
+                y: descriptor.subjectBounds.midY
+            )
         }
     }
 
-    private static func requiresLowerBodyAnchors(_ template: ShotTemplate) -> Bool {
-        switch template.id {
-        case .fullBody, .outfit, .instagramStory:
+    private static func isMissingCriticalLowerBodyLandmarks(
+        template: ShotTemplate,
+        landmarks: PoseLandmarks
+    ) -> Bool {
+        let criticalLowerBodyLandmarks = template.scoring.requiredLandmarks.filter(isLowerBodyLandmark)
+
+        guard !criticalLowerBodyLandmarks.isEmpty else {
+            return false
+        }
+
+        return !criticalLowerBodyLandmarks.allSatisfy { landmarks[$0] != nil }
+    }
+
+    private static func isLowerBodyLandmark(_ landmark: PoseLandmarkName) -> Bool {
+        switch landmark {
+        case .leftHip,
+                .rightHip,
+                .leftKnee,
+                .rightKnee,
+                .leftAnkle,
+                .rightAnkle,
+                .leftHeel,
+                .rightHeel,
+                .leftFootIndex,
+                .rightFootIndex:
             return true
-        case .halfBody, .portrait, .ruleOfThirds:
+        default:
             return false
         }
     }

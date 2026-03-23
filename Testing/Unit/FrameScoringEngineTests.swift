@@ -23,14 +23,18 @@ final class FrameScoringEngineTests: XCTestCase {
         XCTAssertGreaterThan(analysis.metrics.subjectHeightRatio, 1.15)
     }
 
-    func testFullBodyTemplateRejectsTorsoOnlyPose() {
+    func testFullBodyTemplateKeepsTrackingPartialPoseButStaysNotReadyWithoutLowerBodyLandmarks() {
+        let template = ShotTemplateRegistry.template(for: .fullBody)
         let analysis = FrameScoringEngine.analyze(
-            template: ShotTemplateRegistry.template(for: .fullBody),
+            template: template,
             poseFrame: makeCenteredPortraitFrame()
         )
 
-        XCTAssertEqual(analysis.metrics.visibleLandmarkCount, 0)
-        XCTAssertEqual(analysis.scores.totalScore, 0)
+        XCTAssertGreaterThan(analysis.metrics.visibleLandmarkCount, 0)
+        XCTAssertNotNil(analysis.metrics.subjectBounds)
+        XCTAssertGreaterThan(analysis.metrics.requiredLandmarkRatio, 0.5)
+        XCTAssertEqual(analysis.scores.requiredScore, 0)
+        XCTAssertLessThan(analysis.scores.totalScore, template.readyThreshold)
     }
 
     func testWeakTorsoPoseFallsBackToNoSubject() {

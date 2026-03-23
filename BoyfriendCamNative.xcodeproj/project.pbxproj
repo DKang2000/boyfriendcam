@@ -57,6 +57,7 @@
 		A00000000000000000000130 /* CaptureSessionRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000006B /* CaptureSessionRecordTests.swift */; };
 		A00000000000000000000131 /* CropPreviewConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000006C /* CropPreviewConfigurationTests.swift */; };
 		A00000000000000000000132 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000006D /* Assets.xcassets */; };
+		A00000000000000000000133 /* PoseFrameFocusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000006E /* PoseFrameFocusTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +128,7 @@
 		A0000000000000000000006B /* CaptureSessionRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureSessionRecordTests.swift; sourceTree = "<group>"; };
 		A0000000000000000000006C /* CropPreviewConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropPreviewConfigurationTests.swift; sourceTree = "<group>"; };
 		A0000000000000000000006D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A0000000000000000000006E /* PoseFrameFocusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseFrameFocusTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -284,6 +286,7 @@
 				A0000000000000000000006B /* CaptureSessionRecordTests.swift */,
 				A0000000000000000000006C /* CropPreviewConfigurationTests.swift */,
 				A0000000000000000000005A /* FrameScoringEngineTests.swift */,
+				A0000000000000000000006E /* PoseFrameFocusTests.swift */,
 				A00000000000000000000050 /* PoseFrameMapperTests.swift */,
 				A0000000000000000000005B /* PromptSelectionEngineTests.swift */,
 				A00000000000000000000053 /* ShotTemplateRegistryTests.swift */,
@@ -521,6 +524,7 @@
 				A00000000000000000000130 /* CaptureSessionRecordTests.swift in Sources */,
 				A00000000000000000000131 /* CropPreviewConfigurationTests.swift in Sources */,
 				A0000000000000000000011F /* FrameScoringEngineTests.swift in Sources */,
+				A00000000000000000000133 /* PoseFrameFocusTests.swift in Sources */,
 				A00000000000000000000117 /* PoseFrameMapperTests.swift in Sources */,
 				A00000000000000000000120 /* PromptSelectionEngineTests.swift in Sources */,
 				A00000000000000000000118 /* ShotTemplateRegistryTests.swift in Sources */,

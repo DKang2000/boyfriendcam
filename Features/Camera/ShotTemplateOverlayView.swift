@@ -10,6 +10,13 @@ struct ShotTemplateOverlayView: View {
         Canvas { context, size in
             let box = resolvedTargetBox(in: size)
             let center = CGPoint(x: size.width / 2, y: size.height / 2)
+            let adaptiveSilhouette = displayedBodyDescriptor.map {
+                LivePoseOverlayRenderer.resolvedSilhouette(
+                    for: $0,
+                    in: size,
+                    isUpsideDown: isUpsideDown
+                )
+            }
 
             drawCrosshair(context: &context, size: size, center: center)
 
@@ -19,10 +26,8 @@ struct ShotTemplateOverlayView: View {
 
             drawSilhouette(
                 context: &context,
-                size: size,
                 box: box,
-                bodyDescriptor: displayedBodyDescriptor,
-                isUpsideDown: isUpsideDown
+                silhouette: adaptiveSilhouette
             )
         }
         .opacity(0.72)
@@ -118,16 +123,13 @@ struct ShotTemplateOverlayView: View {
 
     private func drawSilhouette(
         context: inout GraphicsContext,
-        size: CGSize,
         box: CGRect,
-        bodyDescriptor: PoseBodyDescriptor?,
-        isUpsideDown: Bool
+        silhouette: PoseAdaptiveSilhouette?
     ) {
-        if let adaptiveSilhouette = makeAdaptiveSilhouette(in: size, bodyDescriptor: bodyDescriptor) {
+        if let silhouette {
             drawAdaptiveSilhouette(
                 context: &context,
-                silhouette: adaptiveSilhouette,
-                isUpsideDown: isUpsideDown
+                silhouette: silhouette
             )
             return
         }
@@ -251,7 +253,7 @@ struct ShotTemplateOverlayView: View {
         legGap.closeSubpath()
         silhouette.addPath(legGap)
 
-        let silhouetteTransform = silhouetteTransform(
+        let silhouetteTransform = LivePoseOverlayRenderer.silhouetteTransform(
             for: CGRect(
                 x: centerX - shoulderHalf,
                 y: headRect.minY,
@@ -274,192 +276,14 @@ struct ShotTemplateOverlayView: View {
 
     private func drawAdaptiveSilhouette(
         context: inout GraphicsContext,
-        silhouette: AdaptiveSilhouette,
-        isUpsideDown: Bool
+        silhouette: PoseAdaptiveSilhouette
     ) {
-        let silhouetteFill = Color.white.opacity(0.70)
-        let silhouetteGlow = Color.white.opacity(0.06)
-        let resolvedSilhouette: AdaptiveSilhouette
-
-        if isUpsideDown {
-            let bounds = adaptiveBounds(for: silhouette)
-            let transform = silhouetteTransform(for: bounds, isUpsideDown: true)
-            resolvedSilhouette = silhouette.applying(transform)
-        } else {
-            resolvedSilhouette = silhouette
-        }
-
-        context.addFilter(.shadow(color: silhouetteGlow, radius: 10, x: 0, y: 0))
-        context.fill(Path(ellipseIn: resolvedSilhouette.headRect), with: .color(silhouetteFill))
-        context.fill(resolvedSilhouette.torso, with: .color(silhouetteFill))
-        context.stroke(
-            resolvedSilhouette.leftArm,
-            with: .color(silhouetteFill),
-            style: StrokeStyle(
-                lineWidth: resolvedSilhouette.armWidth,
-                lineCap: .round,
-                lineJoin: .round
-            )
+        LivePoseOverlayRenderer.drawHighlight(
+            context: &context,
+            silhouette: silhouette,
+            fillColor: Color.white.opacity(0.70),
+            glowColor: Color.white.opacity(0.06)
         )
-        context.stroke(
-            resolvedSilhouette.rightArm,
-            with: .color(silhouetteFill),
-            style: StrokeStyle(
-                lineWidth: resolvedSilhouette.armWidth,
-                lineCap: .round,
-                lineJoin: .round
-            )
-        )
-        context.stroke(
-            resolvedSilhouette.leftLeg,
-            with: .color(silhouetteFill),
-            style: StrokeStyle(
-                lineWidth: resolvedSilhouette.legWidth,
-                lineCap: .round,
-                lineJoin: .round
-            )
-        )
-        context.stroke(
-            resolvedSilhouette.rightLeg,
-            with: .color(silhouetteFill),
-            style: StrokeStyle(
-                lineWidth: resolvedSilhouette.legWidth,
-                lineCap: .round,
-                lineJoin: .round
-            )
-        )
-    }
-
-    private func makeAdaptiveSilhouette(
-        in size: CGSize,
-        bodyDescriptor: PoseBodyDescriptor?
-    ) -> AdaptiveSilhouette? {
-        guard let bodyDescriptor else {
-            return nil
-        }
-
-        let headCenter = point(from: bodyDescriptor.headCenter, in: size)
-        let shoulderCenter = point(from: bodyDescriptor.shoulderCenter, in: size)
-        let hipCenter = point(from: bodyDescriptor.hipCenter, in: size)
-        let shoulderSpan = max(bodyDescriptor.shoulderWidth * size.width, size.width * 0.10)
-        let hipSpan = max(bodyDescriptor.hipWidth * size.width, shoulderSpan * 0.72)
-        let bodyHeight = max((bodyDescriptor.footY - bodyDescriptor.headCenter.y) * size.height, size.height * 0.22)
-        let headWidth = max(bodyDescriptor.headWidth * size.width, shoulderSpan * 0.34, hipSpan * 0.42)
-        let headHeight = headWidth * 1.24
-        let headRect = CGRect(
-            x: headCenter.x - headWidth / 2,
-            y: headCenter.y - headHeight * 0.44,
-            width: headWidth,
-            height: headHeight
-        )
-
-        let leftShoulder = CGPoint(x: shoulderCenter.x - shoulderSpan * 0.50, y: shoulderCenter.y + bodyHeight * 0.01)
-        let rightShoulder = CGPoint(x: shoulderCenter.x + shoulderSpan * 0.50, y: shoulderCenter.y + bodyHeight * 0.01)
-        let leftHip = CGPoint(x: hipCenter.x - hipSpan * 0.44, y: hipCenter.y)
-        let rightHip = CGPoint(x: hipCenter.x + hipSpan * 0.44, y: hipCenter.y)
-        let armDrop = bodyHeight * 0.36
-        let handDrop = bodyHeight * 0.62
-        let leftElbow = CGPoint(x: leftShoulder.x - shoulderSpan * 0.26, y: shoulderCenter.y + armDrop)
-        let rightElbow = CGPoint(x: rightShoulder.x + shoulderSpan * 0.26, y: shoulderCenter.y + armDrop)
-        let leftWrist = CGPoint(x: leftShoulder.x - shoulderSpan * 0.30, y: shoulderCenter.y + handDrop)
-        let rightWrist = CGPoint(x: rightShoulder.x + shoulderSpan * 0.30, y: shoulderCenter.y + handDrop)
-        let footY = bodyDescriptor.footY * size.height
-        let kneeY = hipCenter.y + (footY - hipCenter.y) * 0.48
-        let leftKnee = CGPoint(x: leftHip.x - hipSpan * 0.08, y: kneeY)
-        let rightKnee = CGPoint(x: rightHip.x + hipSpan * 0.08, y: kneeY)
-        let leftAnkle = CGPoint(x: shoulderCenter.x - hipSpan * 0.18, y: footY)
-        let rightAnkle = CGPoint(x: shoulderCenter.x + hipSpan * 0.18, y: footY)
-
-        let waistLeft = CGPoint(
-            x: lerp(leftShoulder.x, leftHip.x, t: 0.66) + shoulderSpan * 0.02,
-            y: lerp(leftShoulder.y, leftHip.y, t: 0.62)
-        )
-        let waistRight = CGPoint(
-            x: lerp(rightShoulder.x, rightHip.x, t: 0.66) - shoulderSpan * 0.02,
-            y: lerp(rightShoulder.y, rightHip.y, t: 0.62)
-        )
-        let leftShoulderOuter = CGPoint(x: leftShoulder.x - shoulderSpan * 0.12, y: leftShoulder.y + bodyHeight * 0.02)
-        let rightShoulderOuter = CGPoint(x: rightShoulder.x + shoulderSpan * 0.12, y: rightShoulder.y + bodyHeight * 0.02)
-        let leftHipOuter = CGPoint(x: leftHip.x - hipSpan * 0.08, y: leftHip.y)
-        let rightHipOuter = CGPoint(x: rightHip.x + hipSpan * 0.08, y: rightHip.y)
-
-        var torso = Path()
-        torso.move(to: leftShoulderOuter)
-        torso.addQuadCurve(
-            to: rightShoulderOuter,
-            control: CGPoint(x: shoulderCenter.x, y: min(leftShoulderOuter.y, rightShoulderOuter.y) - bodyHeight * 0.10)
-        )
-        torso.addCurve(
-            to: waistRight,
-            control1: CGPoint(x: rightShoulderOuter.x + shoulderSpan * 0.06, y: rightShoulderOuter.y + bodyHeight * 0.12),
-            control2: CGPoint(x: waistRight.x + shoulderSpan * 0.05, y: waistRight.y - bodyHeight * 0.10)
-        )
-        torso.addCurve(
-            to: rightHipOuter,
-            control1: CGPoint(x: waistRight.x + shoulderSpan * 0.02, y: waistRight.y + bodyHeight * 0.05),
-            control2: CGPoint(x: rightHipOuter.x + hipSpan * 0.03, y: rightHipOuter.y - bodyHeight * 0.05)
-        )
-        torso.addQuadCurve(
-            to: leftHipOuter,
-            control: CGPoint(x: hipCenter.x, y: max(leftHipOuter.y, rightHipOuter.y) + bodyHeight * 0.04)
-        )
-        torso.addCurve(
-            to: waistLeft,
-            control1: CGPoint(x: leftHipOuter.x - hipSpan * 0.03, y: leftHipOuter.y - bodyHeight * 0.05),
-            control2: CGPoint(x: waistLeft.x - shoulderSpan * 0.05, y: waistLeft.y + bodyHeight * 0.05)
-        )
-        torso.addCurve(
-            to: leftShoulderOuter,
-            control1: CGPoint(x: waistLeft.x - shoulderSpan * 0.05, y: waistLeft.y - bodyHeight * 0.10),
-            control2: CGPoint(x: leftShoulderOuter.x - shoulderSpan * 0.06, y: leftShoulderOuter.y + bodyHeight * 0.12)
-        )
-        torso.closeSubpath()
-
-        var leftArm = Path()
-        leftArm.move(to: leftShoulder)
-        leftArm.addQuadCurve(
-            to: leftWrist,
-            control: leftElbow
-        )
-
-        var rightArm = Path()
-        rightArm.move(to: rightShoulder)
-        rightArm.addQuadCurve(
-            to: rightWrist,
-            control: rightElbow
-        )
-
-        var leftLeg = Path()
-        leftLeg.move(to: leftHip)
-        leftLeg.addQuadCurve(
-            to: leftAnkle,
-            control: leftKnee
-        )
-
-        var rightLeg = Path()
-        rightLeg.move(to: rightHip)
-        rightLeg.addQuadCurve(
-            to: rightAnkle,
-            control: rightKnee
-        )
-
-        let armWidth = max(shoulderSpan * 0.17, size.width * 0.022)
-        let legWidth = max(hipSpan * 0.22, size.width * 0.024)
-
-        return AdaptiveSilhouette(
-            headRect: headRect,
-            torso: torso,
-            leftArm: leftArm,
-            rightArm: rightArm,
-            leftLeg: leftLeg,
-            rightLeg: rightLeg,
-            armWidth: armWidth,
-            legWidth: legWidth
-        )
-    }
-
-    private func point(from normalizedPoint: CGPoint, in size: CGSize) -> CGPoint {
-        CGPoint(x: normalizedPoint.x * size.width, y: normalizedPoint.y * size.height)
     }
 
     private func fallbackSilhouetteMetrics(for template: ShotTemplate) -> (
@@ -480,48 +304,8 @@ struct ShotTemplateOverlayView: View {
         }
     }
 
-    private func midpoint(_ lhs: CGPoint, _ rhs: CGPoint) -> CGPoint {
-        CGPoint(x: (lhs.x + rhs.x) / 2, y: (lhs.y + rhs.y) / 2)
-    }
-
-    private func distance(_ lhs: CGPoint, _ rhs: CGPoint) -> CGFloat {
-        hypot(lhs.x - rhs.x, lhs.y - rhs.y)
-    }
-
-    private func lerp(_ start: CGFloat, _ end: CGFloat, t: CGFloat) -> CGFloat {
-        start + (end - start) * t
-    }
-
-    private func silhouetteTransform(
-        for bounds: CGRect,
-        isUpsideDown: Bool
-    ) -> CGAffineTransform {
-        guard isUpsideDown else {
-            return .identity
-        }
-
-        return CGAffineTransform(translationX: bounds.midX, y: bounds.midY)
-            .rotated(by: .pi)
-            .translatedBy(x: -bounds.midX, y: -bounds.midY)
-    }
-
-    private func adaptiveBounds(for silhouette: AdaptiveSilhouette) -> CGRect {
-        [
-            silhouette.headRect,
-            silhouette.torso.boundingRect,
-            silhouette.leftArm.boundingRect,
-            silhouette.rightArm.boundingRect,
-            silhouette.leftLeg.boundingRect,
-            silhouette.rightLeg.boundingRect,
-        ]
-        .reduce(into: CGRect.null) { partialResult, rect in
-            partialResult = partialResult.union(rect)
-        }
-    }
-
     private func syncDisplayedBodyDescriptor() {
-        guard let nextDescriptor = poseFrame?.bodyDescriptor(for: template),
-              !requiresLowerBodyAnchors(template) || nextDescriptor.hasLowerBodyAnchors else {
+        guard let nextDescriptor = poseFrame?.bodyDescriptor(for: template) else {
             displayedBodyDescriptor = nil
             return
         }
@@ -532,18 +316,9 @@ struct ShotTemplateOverlayView: View {
             displayedBodyDescriptor = nextDescriptor
         }
     }
-
-    private func requiresLowerBodyAnchors(_ template: ShotTemplate) -> Bool {
-        switch template.id {
-        case .fullBody, .outfit, .instagramStory:
-            return true
-        case .halfBody, .portrait, .ruleOfThirds:
-            return false
-        }
-    }
 }
 
-private struct AdaptiveSilhouette {
+struct PoseAdaptiveSilhouette {
     let headRect: CGRect
     let torso: Path
     let leftArm: Path
@@ -553,8 +328,19 @@ private struct AdaptiveSilhouette {
     let armWidth: CGFloat
     let legWidth: CGFloat
 
-    func applying(_ transform: CGAffineTransform) -> AdaptiveSilhouette {
-        AdaptiveSilhouette(
+    var compositePath: Path {
+        var path = Path()
+        path.addEllipse(in: headRect)
+        path.addPath(torso)
+        path.addPath(leftArm.strokedPath(.init(lineWidth: armWidth, lineCap: .round, lineJoin: .round)))
+        path.addPath(rightArm.strokedPath(.init(lineWidth: armWidth, lineCap: .round, lineJoin: .round)))
+        path.addPath(leftLeg.strokedPath(.init(lineWidth: legWidth, lineCap: .round, lineJoin: .round)))
+        path.addPath(rightLeg.strokedPath(.init(lineWidth: legWidth, lineCap: .round, lineJoin: .round)))
+        return path
+    }
+
+    func applying(_ transform: CGAffineTransform) -> PoseAdaptiveSilhouette {
+        PoseAdaptiveSilhouette(
             headRect: headRect.applying(transform),
             torso: torso.applying(transform),
             leftArm: leftArm.applying(transform),
@@ -564,5 +350,228 @@ private struct AdaptiveSilhouette {
             armWidth: armWidth,
             legWidth: legWidth
         )
+    }
+}
+
+enum LivePoseOverlayRenderer {
+    static func resolvedSilhouette(
+        for descriptor: PoseBodyDescriptor,
+        in size: CGSize,
+        isUpsideDown: Bool
+    ) -> PoseAdaptiveSilhouette {
+        let silhouette = makeAdaptiveSilhouette(in: size, bodyDescriptor: descriptor)
+
+        guard isUpsideDown else {
+            return silhouette
+        }
+
+        let bounds = silhouette.compositePath.boundingRect
+        let transform = silhouetteTransform(for: bounds, isUpsideDown: true)
+        return silhouette.applying(transform)
+    }
+
+    static func drawHighlight(
+        context: inout GraphicsContext,
+        silhouette: PoseAdaptiveSilhouette,
+        fillColor: Color,
+        glowColor: Color,
+        edgeColor: Color? = nil
+    ) {
+        context.addFilter(.shadow(color: glowColor, radius: 10, x: 0, y: 0))
+        context.fill(Path(ellipseIn: silhouette.headRect), with: .color(fillColor))
+        context.fill(silhouette.torso, with: .color(fillColor))
+        context.stroke(
+            silhouette.leftArm,
+            with: .color(fillColor),
+            style: StrokeStyle(lineWidth: silhouette.armWidth, lineCap: .round, lineJoin: .round)
+        )
+        context.stroke(
+            silhouette.rightArm,
+            with: .color(fillColor),
+            style: StrokeStyle(lineWidth: silhouette.armWidth, lineCap: .round, lineJoin: .round)
+        )
+        context.stroke(
+            silhouette.leftLeg,
+            with: .color(fillColor),
+            style: StrokeStyle(lineWidth: silhouette.legWidth, lineCap: .round, lineJoin: .round)
+        )
+        context.stroke(
+            silhouette.rightLeg,
+            with: .color(fillColor),
+            style: StrokeStyle(lineWidth: silhouette.legWidth, lineCap: .round, lineJoin: .round)
+        )
+
+        if let edgeColor {
+            context.stroke(
+                silhouette.compositePath,
+                with: .color(edgeColor),
+                style: StrokeStyle(lineWidth: 1.15, lineCap: .round, lineJoin: .round)
+            )
+        }
+    }
+
+    private static func makeAdaptiveSilhouette(
+        in size: CGSize,
+        bodyDescriptor: PoseBodyDescriptor
+    ) -> PoseAdaptiveSilhouette {
+        let headCenter = point(from: bodyDescriptor.headCenter, in: size)
+        let shoulderCenter = point(from: bodyDescriptor.shoulderCenter, in: size)
+        let hipCenter = point(from: bodyDescriptor.hipCenter, in: size)
+        let leftShoulder = point(from: bodyDescriptor.leftShoulder, in: size)
+        let rightShoulder = point(from: bodyDescriptor.rightShoulder, in: size)
+        let leftElbow = point(from: bodyDescriptor.leftElbow, in: size)
+        let rightElbow = point(from: bodyDescriptor.rightElbow, in: size)
+        let leftWrist = point(from: bodyDescriptor.leftWrist, in: size)
+        let rightWrist = point(from: bodyDescriptor.rightWrist, in: size)
+        let leftHip = point(from: bodyDescriptor.leftHip, in: size)
+        let rightHip = point(from: bodyDescriptor.rightHip, in: size)
+        let leftKnee = point(from: bodyDescriptor.leftKnee, in: size)
+        let rightKnee = point(from: bodyDescriptor.rightKnee, in: size)
+        let leftAnkle = point(from: bodyDescriptor.leftAnkle, in: size)
+        let rightAnkle = point(from: bodyDescriptor.rightAnkle, in: size)
+        let shoulderSpan = max(distance(leftShoulder, rightShoulder), bodyDescriptor.shoulderWidth * size.width, size.width * 0.10)
+        let hipSpan = max(distance(leftHip, rightHip), bodyDescriptor.hipWidth * size.width, shoulderSpan * 0.72)
+        let bodyHeight = max((bodyDescriptor.footY - bodyDescriptor.headCenter.y) * size.height, size.height * 0.22)
+        let headWidth = max(bodyDescriptor.headWidth * size.width, shoulderSpan * 0.34, hipSpan * 0.42)
+        let headHeight = headWidth * 1.24
+        let headRect = CGRect(
+            x: headCenter.x - headWidth / 2,
+            y: headCenter.y - headHeight * 0.44,
+            width: headWidth,
+            height: headHeight
+        )
+
+        let waistLeft = CGPoint(
+            x: lerp(leftShoulder.x, leftHip.x, t: 0.66) + shoulderSpan * 0.02,
+            y: lerp(leftShoulder.y, leftHip.y, t: 0.62)
+        )
+        let waistRight = CGPoint(
+            x: lerp(rightShoulder.x, rightHip.x, t: 0.66) - shoulderSpan * 0.02,
+            y: lerp(rightShoulder.y, rightHip.y, t: 0.62)
+        )
+        let leftShoulderOuter = CGPoint(
+            x: leftShoulder.x - shoulderSpan * 0.12,
+            y: leftShoulder.y + bodyHeight * 0.02
+        )
+        let rightShoulderOuter = CGPoint(
+            x: rightShoulder.x + shoulderSpan * 0.12,
+            y: rightShoulder.y + bodyHeight * 0.02
+        )
+        let leftHipOuter = CGPoint(x: leftHip.x - hipSpan * 0.08, y: leftHip.y)
+        let rightHipOuter = CGPoint(x: rightHip.x + hipSpan * 0.08, y: rightHip.y)
+
+        var torso = Path()
+        torso.move(to: leftShoulderOuter)
+        torso.addQuadCurve(
+            to: rightShoulderOuter,
+            control: CGPoint(
+                x: shoulderCenter.x,
+                y: min(leftShoulderOuter.y, rightShoulderOuter.y) - bodyHeight * 0.10
+            )
+        )
+        torso.addCurve(
+            to: waistRight,
+            control1: CGPoint(
+                x: rightShoulderOuter.x + shoulderSpan * 0.06,
+                y: rightShoulderOuter.y + bodyHeight * 0.12
+            ),
+            control2: CGPoint(
+                x: waistRight.x + shoulderSpan * 0.05,
+                y: waistRight.y - bodyHeight * 0.10
+            )
+        )
+        torso.addCurve(
+            to: rightHipOuter,
+            control1: CGPoint(
+                x: waistRight.x + shoulderSpan * 0.02,
+                y: waistRight.y + bodyHeight * 0.05
+            ),
+            control2: CGPoint(
+                x: rightHipOuter.x + hipSpan * 0.03,
+                y: rightHipOuter.y - bodyHeight * 0.05
+            )
+        )
+        torso.addQuadCurve(
+            to: leftHipOuter,
+            control: CGPoint(
+                x: hipCenter.x,
+                y: max(leftHipOuter.y, rightHipOuter.y) + bodyHeight * 0.04
+            )
+        )
+        torso.addCurve(
+            to: waistLeft,
+            control1: CGPoint(
+                x: leftHipOuter.x - hipSpan * 0.03,
+                y: leftHipOuter.y - bodyHeight * 0.05
+            ),
+            control2: CGPoint(
+                x: waistLeft.x - shoulderSpan * 0.05,
+                y: waistLeft.y + bodyHeight * 0.05
+            )
+        )
+        torso.addCurve(
+            to: leftShoulderOuter,
+            control1: CGPoint(
+                x: waistLeft.x - shoulderSpan * 0.05,
+                y: waistLeft.y - bodyHeight * 0.10
+            ),
+            control2: CGPoint(
+                x: leftShoulderOuter.x - shoulderSpan * 0.06,
+                y: leftShoulderOuter.y + bodyHeight * 0.12
+            )
+        )
+        torso.closeSubpath()
+
+        var leftArm = Path()
+        leftArm.move(to: leftShoulder)
+        leftArm.addQuadCurve(to: leftWrist, control: leftElbow)
+
+        var rightArm = Path()
+        rightArm.move(to: rightShoulder)
+        rightArm.addQuadCurve(to: rightWrist, control: rightElbow)
+
+        var leftLeg = Path()
+        leftLeg.move(to: leftHip)
+        leftLeg.addQuadCurve(to: leftAnkle, control: leftKnee)
+
+        var rightLeg = Path()
+        rightLeg.move(to: rightHip)
+        rightLeg.addQuadCurve(to: rightAnkle, control: rightKnee)
+
+        return PoseAdaptiveSilhouette(
+            headRect: headRect,
+            torso: torso,
+            leftArm: leftArm,
+            rightArm: rightArm,
+            leftLeg: leftLeg,
+            rightLeg: rightLeg,
+            armWidth: max(shoulderSpan * 0.17, size.width * 0.022),
+            legWidth: max(hipSpan * 0.22, size.width * 0.024)
+        )
+    }
+
+    private static func point(from normalizedPoint: CGPoint, in size: CGSize) -> CGPoint {
+        CGPoint(x: normalizedPoint.x * size.width, y: normalizedPoint.y * size.height)
+    }
+
+    private static func distance(_ lhs: CGPoint, _ rhs: CGPoint) -> CGFloat {
+        hypot(lhs.x - rhs.x, lhs.y - rhs.y)
+    }
+
+    private static func lerp(_ start: CGFloat, _ end: CGFloat, t: CGFloat) -> CGFloat {
+        start + (end - start) * t
+    }
+
+    static func silhouetteTransform(
+        for bounds: CGRect,
+        isUpsideDown: Bool
+    ) -> CGAffineTransform {
+        guard isUpsideDown else {
+            return .identity
+        }
+
+        return CGAffineTransform(translationX: bounds.midX, y: bounds.midY)
+            .rotated(by: .pi)
+            .translatedBy(x: -bounds.midX, y: -bounds.midY)
     }
 }

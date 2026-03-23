@@ -195,6 +195,18 @@ final class CameraShellViewModel: ObservableObject {
             ?? latestCapture?.fileURL
     }
 
+    var overlayDebugModeLabel: String {
+        let descriptor: PoseBodyDescriptor?
+
+        if selectedExperienceMode == .coach {
+            descriptor = latestPoseFrame?.coachBodyDescriptor()
+        } else {
+            descriptor = latestPoseFrame?.bodyDescriptor(for: liveCoachingTemplate)
+        }
+
+        return descriptor == nil ? "fallback" : "adaptive"
+    }
+
     func prepareIfNeeded() async {
         if hasPrepared {
             return
