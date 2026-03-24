@@ -674,13 +674,13 @@ private struct CoachGuidanceOverlayView: View {
     let poseFrame: PoseFrame?
     let isGuidanceActive: Bool
     let isUpsideDown: Bool
-    @State private var displayedBodyDescriptor: PoseBodyDescriptor?
+    @State private var displayedRenderDescriptor: PoseRenderDescriptor?
 
     var body: some View {
         Canvas { context, size in
             let overlayOpacity = isGuidanceActive ? 0.68 : 0.0
             let center = CGPoint(x: size.width * 0.5, y: size.height * 0.52)
-            let subjectSilhouette = displayedBodyDescriptor.flatMap {
+            let subjectSilhouette = displayedRenderDescriptor.flatMap {
                 LivePoseOverlayRenderer.resolvedSilhouette(
                     for: $0,
                     in: size,
@@ -708,7 +708,7 @@ private struct CoachGuidanceOverlayView: View {
         .onChange(of: poseFrame) { _, _ in
             syncDisplayedBodyDescriptor()
         }
-        .animation(.spring(response: 0.28, dampingFraction: 0.90), value: displayedBodyDescriptor)
+        .animation(.spring(response: 0.28, dampingFraction: 0.90), value: displayedRenderDescriptor)
         .animation(.easeInOut(duration: 0.28), value: isGuidanceActive)
         .animation(.spring(response: 0.28, dampingFraction: 0.90), value: isUpsideDown)
     }
@@ -782,15 +782,15 @@ private struct CoachGuidanceOverlayView: View {
     }
 
     private func syncDisplayedBodyDescriptor() {
-        guard let nextDescriptor = poseFrame?.coachBodyDescriptor() else {
-            displayedBodyDescriptor = nil
+        guard let nextDescriptor = poseFrame?.coachRenderDescriptor() else {
+            displayedRenderDescriptor = nil
             return
         }
 
-        if let currentDescriptor = displayedBodyDescriptor {
-            displayedBodyDescriptor = currentDescriptor.blended(toward: nextDescriptor, factor: 0.24)
+        if let currentDescriptor = displayedRenderDescriptor {
+            displayedRenderDescriptor = currentDescriptor.blended(toward: nextDescriptor, factor: 0.24)
         } else {
-            displayedBodyDescriptor = nextDescriptor
+            displayedRenderDescriptor = nextDescriptor
         }
     }
 }

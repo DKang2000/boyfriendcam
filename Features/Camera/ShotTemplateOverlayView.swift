@@ -4,13 +4,13 @@ struct ShotTemplateOverlayView: View {
     let template: ShotTemplate
     let poseFrame: PoseFrame?
     let isUpsideDown: Bool
-    @State private var displayedBodyDescriptor: PoseBodyDescriptor?
+    @State private var displayedRenderDescriptor: PoseRenderDescriptor?
 
     var body: some View {
         Canvas { context, size in
             let box = resolvedTargetBox(in: size)
             let center = CGPoint(x: size.width / 2, y: size.height / 2)
-            let adaptiveSilhouette = displayedBodyDescriptor.map {
+            let adaptiveSilhouette = displayedRenderDescriptor.map {
                 LivePoseOverlayRenderer.resolvedSilhouette(
                     for: $0,
                     in: size,
@@ -37,7 +37,7 @@ struct ShotTemplateOverlayView: View {
             syncDisplayedBodyDescriptor()
         }
         .animation(.spring(response: 0.28, dampingFraction: 0.90), value: isUpsideDown)
-        .animation(.easeOut(duration: 0.14), value: displayedBodyDescriptor)
+        .animation(.easeOut(duration: 0.14), value: displayedRenderDescriptor)
     }
 
     private func resolvedTargetBox(in size: CGSize) -> CGRect {
@@ -305,15 +305,15 @@ struct ShotTemplateOverlayView: View {
     }
 
     private func syncDisplayedBodyDescriptor() {
-        guard let nextDescriptor = poseFrame?.bodyDescriptor(for: template) else {
-            displayedBodyDescriptor = nil
+        guard let nextDescriptor = poseFrame?.renderDescriptor(for: template) else {
+            displayedRenderDescriptor = nil
             return
         }
 
-        if let currentDescriptor = displayedBodyDescriptor {
-            displayedBodyDescriptor = currentDescriptor.blended(toward: nextDescriptor, factor: 0.30)
+        if let currentDescriptor = displayedRenderDescriptor {
+            displayedRenderDescriptor = currentDescriptor.blended(toward: nextDescriptor, factor: 0.30)
         } else {
-            displayedBodyDescriptor = nextDescriptor
+            displayedRenderDescriptor = nextDescriptor
         }
     }
 }
@@ -355,7 +355,7 @@ struct PoseAdaptiveSilhouette {
 
 enum LivePoseOverlayRenderer {
     static func resolvedSilhouette(
-        for descriptor: PoseBodyDescriptor,
+        for descriptor: PoseRenderDescriptor,
         in size: CGSize,
         isUpsideDown: Bool
     ) -> PoseAdaptiveSilhouette {
@@ -412,28 +412,20 @@ enum LivePoseOverlayRenderer {
 
     private static func makeAdaptiveSilhouette(
         in size: CGSize,
-        bodyDescriptor: PoseBodyDescriptor
+        bodyDescriptor: PoseRenderDescriptor
     ) -> PoseAdaptiveSilhouette {
-        let headCenter = point(from: bodyDescriptor.headCenter, in: size)
+        let headCenter = point(from: bodyDescriptor.headCenter.point, in: size)
         let shoulderCenter = point(from: bodyDescriptor.shoulderCenter, in: size)
         let hipCenter = point(from: bodyDescriptor.hipCenter, in: size)
-        let leftShoulder = point(from: bodyDescriptor.leftShoulder, in: size)
-        let rightShoulder = point(from: bodyDescriptor.rightShoulder, in: size)
-        let leftElbow = point(from: bodyDescriptor.leftElbow, in: size)
-        let rightElbow = point(from: bodyDescriptor.rightElbow, in: size)
-        let leftWrist = point(from: bodyDescriptor.leftWrist, in: size)
-        let rightWrist = point(from: bodyDescriptor.rightWrist, in: size)
-        let leftHip = point(from: bodyDescriptor.leftHip, in: size)
-        let rightHip = point(from: bodyDescriptor.rightHip, in: size)
-        let leftKnee = point(from: bodyDescriptor.leftKnee, in: size)
-        let rightKnee = point(from: bodyDescriptor.rightKnee, in: size)
-        let leftAnkle = point(from: bodyDescriptor.leftAnkle, in: size)
-        let rightAnkle = point(from: bodyDescriptor.rightAnkle, in: size)
-        let shoulderSpan = max(distance(leftShoulder, rightShoulder), bodyDescriptor.shoulderWidth * size.width, size.width * 0.10)
-        let hipSpan = max(distance(leftHip, rightHip), bodyDescriptor.hipWidth * size.width, shoulderSpan * 0.72)
-        let bodyHeight = max((bodyDescriptor.footY - bodyDescriptor.headCenter.y) * size.height, size.height * 0.22)
-        let headWidth = max(bodyDescriptor.headWidth * size.width, shoulderSpan * 0.34, hipSpan * 0.42)
-        let headHeight = headWidth * 1.24
+        let leftShoulder = point(from: bodyDescriptor.leftShoulder.point, in: size)
+        let rightShoulder = point(from: bodyDescriptor.rightShoulder.point, in: size)
+        let leftHip = point(from: bodyDescriptor.leftHip.point, in: size)
+        let rightHip = point(from: bodyDescriptor.rightHip.point, in: size)
+        let shoulderSpan = max(distance(leftShoulder, rightShoulder), size.width * 0.10)
+        let hipSpan = max(distance(leftHip, rightHip), shoulderSpan * 0.60)
+        let bodyHeight = max(bodyDescriptor.subjectBounds.height * size.height, size.height * 0.20)
+        let headWidth = max(bodyDescriptor.headSize.width * size.width, shoulderSpan * 0.28, hipSpan * 0.34)
+        let headHeight = max(bodyDescriptor.headSize.height * size.height, headWidth * 1.10)
         let headRect = CGRect(
             x: headCenter.x - headWidth / 2,
             y: headCenter.y - headHeight * 0.44,
@@ -441,24 +433,24 @@ enum LivePoseOverlayRenderer {
             height: headHeight
         )
 
-        let waistLeft = CGPoint(
-            x: lerp(leftShoulder.x, leftHip.x, t: 0.66) + shoulderSpan * 0.02,
-            y: lerp(leftShoulder.y, leftHip.y, t: 0.62)
+        let shoulderAxis = normalizedAxis(from: leftShoulder, to: rightShoulder)
+        let hipAxis = normalizedAxis(from: leftHip, to: rightHip)
+        let shoulderOffset = shoulderAxis.scaled(by: shoulderSpan * 0.12)
+        let hipOffset = hipAxis.scaled(by: hipSpan * 0.10)
+        let leftShoulderOuter = leftShoulder.subtracting(shoulderOffset)
+        let rightShoulderOuter = rightShoulder.adding(shoulderOffset)
+        let leftHipOuter = leftHip.subtracting(hipOffset)
+        let rightHipOuter = rightHip.adding(hipOffset)
+        let leftWaist = interpolate(
+            from: leftShoulderOuter,
+            to: leftHipOuter,
+            t: 0.58
         )
-        let waistRight = CGPoint(
-            x: lerp(rightShoulder.x, rightHip.x, t: 0.66) - shoulderSpan * 0.02,
-            y: lerp(rightShoulder.y, rightHip.y, t: 0.62)
+        let rightWaist = interpolate(
+            from: rightShoulderOuter,
+            to: rightHipOuter,
+            t: 0.58
         )
-        let leftShoulderOuter = CGPoint(
-            x: leftShoulder.x - shoulderSpan * 0.12,
-            y: leftShoulder.y + bodyHeight * 0.02
-        )
-        let rightShoulderOuter = CGPoint(
-            x: rightShoulder.x + shoulderSpan * 0.12,
-            y: rightShoulder.y + bodyHeight * 0.02
-        )
-        let leftHipOuter = CGPoint(x: leftHip.x - hipSpan * 0.08, y: leftHip.y)
-        let rightHipOuter = CGPoint(x: rightHip.x + hipSpan * 0.08, y: rightHip.y)
 
         var torso = Path()
         torso.move(to: leftShoulderOuter)
@@ -470,21 +462,21 @@ enum LivePoseOverlayRenderer {
             )
         )
         torso.addCurve(
-            to: waistRight,
+            to: rightWaist,
             control1: CGPoint(
                 x: rightShoulderOuter.x + shoulderSpan * 0.06,
                 y: rightShoulderOuter.y + bodyHeight * 0.12
             ),
             control2: CGPoint(
-                x: waistRight.x + shoulderSpan * 0.05,
-                y: waistRight.y - bodyHeight * 0.10
+                x: rightWaist.x + shoulderSpan * 0.05,
+                y: rightWaist.y - bodyHeight * 0.10
             )
         )
         torso.addCurve(
             to: rightHipOuter,
             control1: CGPoint(
-                x: waistRight.x + shoulderSpan * 0.02,
-                y: waistRight.y + bodyHeight * 0.05
+                x: rightWaist.x + shoulderSpan * 0.02,
+                y: rightWaist.y + bodyHeight * 0.05
             ),
             control2: CGPoint(
                 x: rightHipOuter.x + hipSpan * 0.03,
@@ -499,21 +491,21 @@ enum LivePoseOverlayRenderer {
             )
         )
         torso.addCurve(
-            to: waistLeft,
+            to: leftWaist,
             control1: CGPoint(
                 x: leftHipOuter.x - hipSpan * 0.03,
                 y: leftHipOuter.y - bodyHeight * 0.05
             ),
             control2: CGPoint(
-                x: waistLeft.x - shoulderSpan * 0.05,
-                y: waistLeft.y + bodyHeight * 0.05
+                x: leftWaist.x - shoulderSpan * 0.05,
+                y: leftWaist.y + bodyHeight * 0.05
             )
         )
         torso.addCurve(
             to: leftShoulderOuter,
             control1: CGPoint(
-                x: waistLeft.x - shoulderSpan * 0.05,
-                y: waistLeft.y - bodyHeight * 0.10
+                x: leftWaist.x - shoulderSpan * 0.05,
+                y: leftWaist.y - bodyHeight * 0.10
             ),
             control2: CGPoint(
                 x: leftShoulderOuter.x - shoulderSpan * 0.06,
@@ -522,21 +514,26 @@ enum LivePoseOverlayRenderer {
         )
         torso.closeSubpath()
 
-        var leftArm = Path()
-        leftArm.move(to: leftShoulder)
-        leftArm.addQuadCurve(to: leftWrist, control: leftElbow)
-
-        var rightArm = Path()
-        rightArm.move(to: rightShoulder)
-        rightArm.addQuadCurve(to: rightWrist, control: rightElbow)
-
-        var leftLeg = Path()
-        leftLeg.move(to: leftHip)
-        leftLeg.addQuadCurve(to: leftAnkle, control: leftKnee)
-
-        var rightLeg = Path()
-        rightLeg.move(to: rightHip)
-        rightLeg.addQuadCurve(to: rightAnkle, control: rightKnee)
+        let leftArm = limbPath(points: [
+            leftShoulder,
+            optionalPoint(from: bodyDescriptor.leftElbow?.point, in: size),
+            optionalPoint(from: bodyDescriptor.leftWrist?.point, in: size),
+        ].compactMap { $0 })
+        let rightArm = limbPath(points: [
+            rightShoulder,
+            optionalPoint(from: bodyDescriptor.rightElbow?.point, in: size),
+            optionalPoint(from: bodyDescriptor.rightWrist?.point, in: size),
+        ].compactMap { $0 })
+        let leftLeg = limbPath(points: [
+            leftHip,
+            optionalPoint(from: bodyDescriptor.leftKnee?.point, in: size),
+            optionalPoint(from: bodyDescriptor.leftAnkle?.point, in: size),
+        ].compactMap { $0 })
+        let rightLeg = limbPath(points: [
+            rightHip,
+            optionalPoint(from: bodyDescriptor.rightKnee?.point, in: size),
+            optionalPoint(from: bodyDescriptor.rightAnkle?.point, in: size),
+        ].compactMap { $0 })
 
         return PoseAdaptiveSilhouette(
             headRect: headRect,
@@ -554,12 +551,50 @@ enum LivePoseOverlayRenderer {
         CGPoint(x: normalizedPoint.x * size.width, y: normalizedPoint.y * size.height)
     }
 
+    private static func optionalPoint(from normalizedPoint: CGPoint?, in size: CGSize) -> CGPoint? {
+        guard let normalizedPoint else {
+            return nil
+        }
+
+        return point(from: normalizedPoint, in: size)
+    }
+
     private static func distance(_ lhs: CGPoint, _ rhs: CGPoint) -> CGFloat {
         hypot(lhs.x - rhs.x, lhs.y - rhs.y)
     }
 
-    private static func lerp(_ start: CGFloat, _ end: CGFloat, t: CGFloat) -> CGFloat {
-        start + (end - start) * t
+    private static func interpolate(from start: CGPoint, to end: CGPoint, t: CGFloat) -> CGPoint {
+        CGPoint(
+            x: start.x + (end.x - start.x) * t,
+            y: start.y + (end.y - start.y) * t
+        )
+    }
+
+    private static func normalizedAxis(from start: CGPoint, to end: CGPoint) -> CGPoint {
+        let deltaX = end.x - start.x
+        let deltaY = end.y - start.y
+        let length = max(hypot(deltaX, deltaY), 0.001)
+        return CGPoint(x: deltaX / length, y: deltaY / length)
+    }
+
+    private static func limbPath(points: [CGPoint]) -> Path {
+        guard points.count > 1 else {
+            return Path()
+        }
+
+        var path = Path()
+        path.move(to: points[0])
+
+        if points.count == 3 {
+            path.addQuadCurve(to: points[2], control: points[1])
+            return path
+        }
+
+        for point in points.dropFirst() {
+            path.addLine(to: point)
+        }
+
+        return path
     }
 
     static func silhouetteTransform(
@@ -573,5 +608,19 @@ enum LivePoseOverlayRenderer {
         return CGAffineTransform(translationX: bounds.midX, y: bounds.midY)
             .rotated(by: .pi)
             .translatedBy(x: -bounds.midX, y: -bounds.midY)
+    }
+}
+
+private extension CGPoint {
+    func adding(_ other: CGPoint) -> CGPoint {
+        CGPoint(x: x + other.x, y: y + other.y)
+    }
+
+    func subtracting(_ other: CGPoint) -> CGPoint {
+        CGPoint(x: x - other.x, y: y - other.y)
+    }
+
+    func scaled(by scalar: CGFloat) -> CGPoint {
+        CGPoint(x: x * scalar, y: y * scalar)
     }
 }

@@ -196,12 +196,12 @@ final class CameraShellViewModel: ObservableObject {
     }
 
     var overlayDebugModeLabel: String {
-        let descriptor: PoseBodyDescriptor?
+        let descriptor: PoseRenderDescriptor?
 
         if selectedExperienceMode == .coach {
-            descriptor = latestPoseFrame?.coachBodyDescriptor()
+            descriptor = latestPoseFrame?.coachRenderDescriptor()
         } else {
-            descriptor = latestPoseFrame?.bodyDescriptor(for: liveCoachingTemplate)
+            descriptor = latestPoseFrame?.renderDescriptor(for: liveCoachingTemplate)
         }
 
         return descriptor == nil ? "fallback" : "adaptive"

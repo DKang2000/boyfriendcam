@@ -81,6 +81,104 @@ struct PoseBodyDescriptor: Equatable {
     }
 }
 
+struct PoseTrackedJoint: Equatable {
+    let point: CGPoint
+    let isObserved: Bool
+
+    func blended(toward target: PoseTrackedJoint, factor: CGFloat) -> PoseTrackedJoint {
+        let resolvedFactor = min(max(factor, 0), 1)
+        return PoseTrackedJoint(
+            point: CGPoint(
+                x: point.x + (target.point.x - point.x) * resolvedFactor,
+                y: point.y + (target.point.y - point.y) * resolvedFactor
+            ),
+            isObserved: target.isObserved
+        )
+    }
+}
+
+struct PoseRenderDescriptor: Equatable {
+    let headCenter: PoseTrackedJoint
+    let headSize: CGSize
+    let shoulderCenter: CGPoint
+    let hipCenter: CGPoint
+    let subjectCenter: CGPoint
+    let subjectBounds: CGRect
+    let confidence: CGFloat
+    let visibleLandmarkCount: Int
+    let hasLowerBodyAnchors: Bool
+    let leftShoulder: PoseTrackedJoint
+    let rightShoulder: PoseTrackedJoint
+    let leftHip: PoseTrackedJoint
+    let rightHip: PoseTrackedJoint
+    let leftElbow: PoseTrackedJoint?
+    let rightElbow: PoseTrackedJoint?
+    let leftWrist: PoseTrackedJoint?
+    let rightWrist: PoseTrackedJoint?
+    let leftKnee: PoseTrackedJoint?
+    let rightKnee: PoseTrackedJoint?
+    let leftAnkle: PoseTrackedJoint?
+    let rightAnkle: PoseTrackedJoint?
+
+    func blended(toward target: PoseRenderDescriptor, factor: CGFloat) -> PoseRenderDescriptor {
+        let resolvedFactor = min(max(factor, 0), 1)
+
+        return PoseRenderDescriptor(
+            headCenter: headCenter.blended(toward: target.headCenter, factor: resolvedFactor),
+            headSize: CGSize(
+                width: headSize.width + (target.headSize.width - headSize.width) * resolvedFactor,
+                height: headSize.height + (target.headSize.height - headSize.height) * resolvedFactor
+            ),
+            shoulderCenter: interpolated(from: shoulderCenter, to: target.shoulderCenter, factor: resolvedFactor),
+            hipCenter: interpolated(from: hipCenter, to: target.hipCenter, factor: resolvedFactor),
+            subjectCenter: interpolated(from: subjectCenter, to: target.subjectCenter, factor: resolvedFactor),
+            subjectBounds: CGRect(
+                x: subjectBounds.minX + (target.subjectBounds.minX - subjectBounds.minX) * resolvedFactor,
+                y: subjectBounds.minY + (target.subjectBounds.minY - subjectBounds.minY) * resolvedFactor,
+                width: subjectBounds.width + (target.subjectBounds.width - subjectBounds.width) * resolvedFactor,
+                height: subjectBounds.height + (target.subjectBounds.height - subjectBounds.height) * resolvedFactor
+            ),
+            confidence: confidence + (target.confidence - confidence) * resolvedFactor,
+            visibleLandmarkCount: target.visibleLandmarkCount,
+            hasLowerBodyAnchors: target.hasLowerBodyAnchors,
+            leftShoulder: leftShoulder.blended(toward: target.leftShoulder, factor: resolvedFactor),
+            rightShoulder: rightShoulder.blended(toward: target.rightShoulder, factor: resolvedFactor),
+            leftHip: leftHip.blended(toward: target.leftHip, factor: resolvedFactor),
+            rightHip: rightHip.blended(toward: target.rightHip, factor: resolvedFactor),
+            leftElbow: blended(leftElbow, toward: target.leftElbow, factor: resolvedFactor),
+            rightElbow: blended(rightElbow, toward: target.rightElbow, factor: resolvedFactor),
+            leftWrist: blended(leftWrist, toward: target.leftWrist, factor: resolvedFactor),
+            rightWrist: blended(rightWrist, toward: target.rightWrist, factor: resolvedFactor),
+            leftKnee: blended(leftKnee, toward: target.leftKnee, factor: resolvedFactor),
+            rightKnee: blended(rightKnee, toward: target.rightKnee, factor: resolvedFactor),
+            leftAnkle: blended(leftAnkle, toward: target.leftAnkle, factor: resolvedFactor),
+            rightAnkle: blended(rightAnkle, toward: target.rightAnkle, factor: resolvedFactor)
+        )
+    }
+
+    private func blended(
+        _ source: PoseTrackedJoint?,
+        toward target: PoseTrackedJoint?,
+        factor: CGFloat
+    ) -> PoseTrackedJoint? {
+        switch (source, target) {
+        case let (source?, target?):
+            return source.blended(toward: target, factor: factor)
+        case (_, let target?):
+            return target
+        default:
+            return nil
+        }
+    }
+
+    private func interpolated(from start: CGPoint, to end: CGPoint, factor: CGFloat) -> CGPoint {
+        CGPoint(
+            x: start.x + (end.x - start.x) * factor,
+            y: start.y + (end.y - start.y) * factor
+        )
+    }
+}
+
 extension PoseFrame {
     func preferredSubjectFocusPoint() -> CGPoint? {
         if let eyeCenter = eyeCenter() {
@@ -110,6 +208,14 @@ extension PoseFrame {
         adaptiveBodyDescriptor()
     }
 
+    func renderDescriptor(for template: ShotTemplate) -> PoseRenderDescriptor? {
+        adaptiveRenderDescriptor()
+    }
+
+    func coachRenderDescriptor() -> PoseRenderDescriptor? {
+        adaptiveRenderDescriptor()
+    }
+
     func eyeCenter() -> CGPoint? {
         if
             let leftEye = landmarks[.leftEye],
@@ -123,6 +229,76 @@ extension PoseFrame {
 
     func eyeSpan() -> CGFloat {
         resolvedEyeSpan()
+    }
+
+    private func adaptiveRenderDescriptor() -> PoseRenderDescriptor? {
+        guard let bodyDescriptor = adaptiveBodyDescriptor() else {
+            return nil
+        }
+
+        let headSize = CGSize(
+            width: max(bodyDescriptor.headWidth, 0.05),
+            height: max(bodyDescriptor.headWidth * 1.24, 0.07)
+        )
+
+        return PoseRenderDescriptor(
+            headCenter: PoseTrackedJoint(
+                point: bodyDescriptor.headCenter,
+                isObserved: landmarks[.leftEar] != nil
+                    || landmarks[.rightEar] != nil
+                    || landmarks[.leftEye] != nil
+                    || landmarks[.rightEye] != nil
+                    || landmarks[.nose] != nil
+            ),
+            headSize: headSize,
+            shoulderCenter: bodyDescriptor.shoulderCenter,
+            hipCenter: bodyDescriptor.hipCenter,
+            subjectCenter: bodyDescriptor.subjectCenter,
+            subjectBounds: bodyDescriptor.subjectBounds,
+            confidence: bodyDescriptor.confidence,
+            visibleLandmarkCount: visibleLandmarkCount,
+            hasLowerBodyAnchors: bodyDescriptor.hasLowerBodyAnchors,
+            leftShoulder: PoseTrackedJoint(
+                point: bodyDescriptor.leftShoulder,
+                isObserved: landmarks[.leftShoulder] != nil
+            ),
+            rightShoulder: PoseTrackedJoint(
+                point: bodyDescriptor.rightShoulder,
+                isObserved: landmarks[.rightShoulder] != nil
+            ),
+            leftHip: PoseTrackedJoint(
+                point: bodyDescriptor.leftHip,
+                isObserved: landmarks[.leftHip] != nil
+            ),
+            rightHip: PoseTrackedJoint(
+                point: bodyDescriptor.rightHip,
+                isObserved: landmarks[.rightHip] != nil
+            ),
+            leftElbow: trackedJoint(
+                landmarkNames: [.leftElbow]
+            ),
+            rightElbow: trackedJoint(
+                landmarkNames: [.rightElbow]
+            ),
+            leftWrist: trackedJoint(
+                landmarkNames: [.leftWrist, .leftIndex, .leftPinky, .leftThumb]
+            ),
+            rightWrist: trackedJoint(
+                landmarkNames: [.rightWrist, .rightIndex, .rightPinky, .rightThumb]
+            ),
+            leftKnee: trackedJoint(
+                landmarkNames: [.leftKnee]
+            ),
+            rightKnee: trackedJoint(
+                landmarkNames: [.rightKnee]
+            ),
+            leftAnkle: trackedJoint(
+                landmarkNames: [.leftAnkle, .leftHeel, .leftFootIndex]
+            ),
+            rightAnkle: trackedJoint(
+                landmarkNames: [.rightAnkle, .rightHeel, .rightFootIndex]
+            )
+        )
     }
 
     private func adaptiveBodyDescriptor() -> PoseBodyDescriptor? {
@@ -507,6 +683,16 @@ extension PoseFrame {
 
     private func clampedPoint(_ point: CGPoint) -> CGPoint {
         CGPoint(x: clamp(point.x), y: clamp(point.y))
+    }
+
+    private func trackedJoint(landmarkNames: [PoseLandmarkName]) -> PoseTrackedJoint? {
+        for landmarkName in landmarkNames {
+            if let landmark = landmarks[landmarkName] {
+                return PoseTrackedJoint(point: point(from: landmark), isObserved: true)
+            }
+        }
+
+        return nil
     }
 }
 
